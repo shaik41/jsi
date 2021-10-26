@@ -1,0 +1,6 @@
+rootProject.name = 'JsiPocExample'
+apply from: file("../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesSettingsGradle(settings)
+include ':app'
+
+include ':reactnativejsipoc'
+project(':reactnativejsipoc').projectDir = new File(rootProject.projectDir, '../../android')
