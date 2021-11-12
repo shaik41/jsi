@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class JsiPocPackage implements JSIModulePackage {
+public class JsiPocModulePackage implements JSIModulePackage {
   @Override
   public List<JSIModuleSpec> getJSIModules(ReactApplicationContext reactApplicationContext, JavaScriptContextHolder jsContext) {
 

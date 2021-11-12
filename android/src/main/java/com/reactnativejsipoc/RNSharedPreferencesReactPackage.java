@@ -1,4 +1,4 @@
-package com.reactnativejsikrypton;
+package com.reactnativejsipoc;
 
 import com.facebook.react.ReactPackage;
 import java.util.ArrayList;

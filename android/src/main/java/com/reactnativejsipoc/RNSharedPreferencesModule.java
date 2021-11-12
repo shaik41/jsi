@@ -1,4 +1,4 @@
-package com.reactnativejsikrypton;
+package com.reactnativejsipoc;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
@@ -9,10 +9,12 @@ import com.facebook.react.bridge.Callback;
 
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.widget.ListView;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class RNSharedPreferencesModule  extends ReactContextBaseJavaModule {
 
@@ -27,8 +29,7 @@ public class RNSharedPreferencesModule  extends ReactContextBaseJavaModule {
   private String shared_name = "wit_player_shared_preferences";
 
   private BroadcastReceiver bt_info_receiver = null;
-
-
+  private Callback successCallback;
 
 
   public void onCreate(Bundle savedInstanceState) {
@@ -70,6 +71,14 @@ public class RNSharedPreferencesModule  extends ReactContextBaseJavaModule {
     initSharedHandler();
     String value = SharedDataProvider.getSharedValue(key);
     successCallback.invoke(value);
+
+  }
+
+
+  @ReactMethod
+  public void getBridgeMessage(Callback successCallback){
+
+    successCallback.invoke("HI I'M BRIDGE");
 
   }
 
@@ -141,5 +150,41 @@ public class RNSharedPreferencesModule  extends ReactContextBaseJavaModule {
     SharedDataProvider.deleteSharedValue(key);
   }
 
+
+
+  @ReactMethod
+  public void getObjectFromJava(Callback successCallback){
+    WritableMap map = new WritableNativeMap();
+     map.putString("Name","Shaik");
+    map.putString("Age","28");
+    successCallback.invoke(map);
+  }
+
+
+
+  @ReactMethod
+  public void startAsyncTaskBridge(Callback successCallback) {
+    this.successCallback = successCallback;
+    new LongOperation().execute();
+  }
+  public final class LongOperation extends AsyncTask<Void, Void, String> {
+
+    @Override
+    protected String doInBackground(Void... params) {
+      for (int i = 0; i < 5; i++) {
+        try {
+          Thread.sleep(1000);
+        } catch (InterruptedException e) {
+          // We were cancelled; stop sleeping!
+        }
+      }
+      return "Executed";
+    }
+
+    @Override
+    protected void onPostExecute(String result) {
+     successCallback.invoke(result);
+    }
+  }
 
 }

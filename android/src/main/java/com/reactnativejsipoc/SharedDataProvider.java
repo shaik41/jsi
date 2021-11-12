@@ -1,4 +1,4 @@
-package com.reactnativejsikrypton;
+package com.reactnativejsipoc;
 
 import java.util.ArrayList;
 import java.util.List;

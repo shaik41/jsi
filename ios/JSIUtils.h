@@ -1,15 +1,6 @@
-//
-//  YeetJSIUTils.h
-//  yeet
-//
-//  Created by Jarred WSumner on 1/30/20.
-//  Copyright © 2020 Facebook. All rights reserved.
-//
-
 #import <Foundation/Foundation.h>
 #import <jsi/jsi.h>
-#import <ReactCommon/JSCallInvoker.h>
-#import <ReactCommon/LongLivedObject.h>
+#import <ReactCommon/CallInvoker.h>
 #import <React/RCTConvert.h>
 #import <React/RCTBridgeModule.h>
 //#import <ReactCommon/TurboModuleUtils.h>

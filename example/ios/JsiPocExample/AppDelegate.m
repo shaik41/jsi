@@ -10,7 +10,7 @@
 #import <React/RCTBridge.h>
 #import <React/RCTBundleURLProvider.h>
 #import <React/RCTRootView.h>
-
+#import <react-native-jsi-poc/react-native-jsi-poc.h>
 #ifdef FB_SONARKIT_ENABLED
 #import <FlipperKit/FlipperClient.h>
 #import <FlipperKitLayoutPlugin/FlipperKitLayoutPlugin.h>
@@ -58,6 +58,20 @@ static void InitializeFlipper(UIApplication *application) {
 #else
   return [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"jsbundle"];
 #endif
+}
+
+// C "trampoline" function to invoke Objective-C method
+int MyObjectDoSomethingWith (void *self, void *aParameter)
+{
+    // Call the Objective-C method using Objective-C syntax
+  return [(__bridge id) self doSomethingWith:aParameter];
+}
+
+- (int) doSomethingWith:(void *) aParameter
+{
+    // The Objective-C function you wanted to call from C++.
+    // do work here..
+    return 21 ; // half of 42
 }
 
 @end

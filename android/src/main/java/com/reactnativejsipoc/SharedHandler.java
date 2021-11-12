@@ -1,4 +1,4 @@
-package com.reactnativejsikrypton;
+package com.reactnativejsipoc;
 
 import android.content.Context;
 import android.content.SharedPreferences;

@@ -1,16 +1,5 @@
-//
-//  REAJsiUtilities.cpp
-//  RNReanimated
-//
-//  Created by Christian Falch on 25/04/2019.
-//  Copyright © 2019 Facebook. All rights reserved.
-//
-
 #include "JSIUtils.h"
 
-
-
-#import <ReactCommon/TurboModule.h>
 
 /**
  * All helper functions are ObjC++ specific.
