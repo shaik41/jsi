@@ -1,26 +1,25 @@
-# react-native-jsi-poc
+# Benchmarking JSI
 
-Myntra POC for JSI
+1. RN version: 0.63.4
+2. NDK Version: 22.0.x
+3. CMake Version: 3.10.x
+4. Test Device : Samsung S10
 
 Benchmark between
 1. Get String from KV store: 
-    a.Android Shared Prefs over JSI
-    b.Async Storage 
-    c.Android Shared Pref over Bridge
+    1. Android Shared Prefs over JSI
+    2. Async Storage 
+    3. Android Shared Pref over Bridge
 2. Retrieve a Java String 
-    a.JSI
-    b.Bridge
+    1. JSI
+    2. Bridge
 3. Retrieve a Java Object 
-    a.JSI
-    b.Bridge
+    1. JSI
+    2. Bridge
 4. Query 100 Rows from Table 
-    a.JSI
-    b.Bridge    
+    1. JSI
+    2. Bridge    
 
-RN version: 0.63.4
-NDK Version: 22.0.x
-CMake Version: 3.10.x
-Test Device : Samsung S10
 
 Results:
 1. Get a JSON string of 212148 characters from KV Store 
