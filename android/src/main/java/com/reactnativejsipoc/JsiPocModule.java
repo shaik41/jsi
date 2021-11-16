@@ -48,7 +48,6 @@ public class JsiPocModule extends ReactContextBaseJavaModule {
 
   private native void setMessage(String message, long jsi);
 
-  private native void setObject(Object object);
 
   public void installLib(JavaScriptContextHolder reactContext) {
 
@@ -150,6 +149,7 @@ public class JsiPocModule extends ReactContextBaseJavaModule {
   }
 
 
+  //TODO remove .toArray()
   public Student[] getAllStudents(){
     List<Student> students = db.getAllStudents();
     Student[] students1 = new Student[students.size()];

@@ -442,9 +442,6 @@ Java_com_reactnativejsipoc_JsiPocModule_nativeInstall(JNIEnv *env, jobject thiz,
         installFromAndroid(*runtime);
     }
 
-    std::thread t2(test, "Hi");
-    t2.detach();
-
     env->GetJavaVM(&java_vm);
     java_object = env->NewGlobalRef(thiz);
 }
@@ -465,7 +462,6 @@ void sendValueToJS(jsi::Runtime &rt, jstring message){
     string  a = to_string(msEnd.count()-msStart.count());
     char cstr[a.size() + 1];
     strcpy(cstr, a.c_str());
-    printf("Atif %s", cstr);
 
     rt.global().getProperty(rt,"callback").getObject(rt).getFunction(rt).call(rt,Value(rt, String::createFromUtf8(rt, str)));
 
@@ -481,10 +477,4 @@ Java_com_reactnativejsipoc_JsiPocModule_setMessage(JNIEnv *env, jobject thiz, js
 
         sendValueToJS(*runT,message);
 
-}
-
-extern "C"
-JNIEXPORT void JNICALL
-Java_com_reactnativejsipoc_JsiPocModule_setObject(JNIEnv *env, jobject thiz, jobject object) {
-    // TODO: implement setObject()
 }

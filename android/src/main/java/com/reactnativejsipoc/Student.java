@@ -1,7 +1,4 @@
 package com.reactnativejsipoc;
-/**
- * Created by ravi on 20/02/18.
- */
 
 public class Student {
   public static final String TABLE_NAME = "notes";
