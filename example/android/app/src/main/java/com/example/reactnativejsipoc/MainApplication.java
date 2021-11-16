@@ -11,9 +11,9 @@ import com.facebook.react.bridge.JSIModulePackage;
 import com.facebook.soloader.SoLoader;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
-import com.reactnativejsipoc.JsiPocModulePackage;
-import com.reactnativejsipoc.JsiPocPackage;
-import com.reactnativejsipoc.RNSharedPreferencesReactPackage;
+import com.reactnativejsipoc.jsi.JsiPocModulePackage;
+import com.reactnativejsipoc.jsi.JsiPocPackage;
+import com.reactnativejsipoc.sp.RNSharedPreferencesReactPackage;
 
 public class MainApplication extends Application implements ReactApplication {
 

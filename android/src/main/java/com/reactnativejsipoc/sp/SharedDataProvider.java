@@ -1,4 +1,4 @@
-package com.reactnativejsipoc;
+package com.reactnativejsipoc.sp;
 
 import java.util.ArrayList;
 import java.util.List;

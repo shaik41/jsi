@@ -1,4 +1,4 @@
-package com.reactnativejsipoc;
+package com.reactnativejsipoc.sp;
 
 import android.content.Context;
 import android.content.SharedPreferences;

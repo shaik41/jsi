@@ -1,4 +1,4 @@
-package com.reactnativejsipoc;
+package com.reactnativejsipoc.jsi;
 
 import androidx.annotation.NonNull;
 

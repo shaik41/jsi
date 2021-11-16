@@ -7,7 +7,6 @@ import {
   AsyncStorage,
   TouchableHighlight,
   NativeModules,
-  Alert,
   ScrollView,
 } from 'react-native';
 import Reactotron from 'reactotron-react-native';
@@ -17,21 +16,12 @@ export default function App() {
   if (__DEV__) {
     import('./ReactotronConfig');
   }
-  const [spValue, setSpValue] = React.useState('');
-  const [asyncValue, setAsyncValue] = React.useState('');
-  const [spBValue, setBSpValue] = React.useState('');
-  const [jsiMessage, setjsiMessage] = React.useState('');
-  const [mativeModuleMessage, setnativeModuleMessage] = React.useState('');
 
   const [timeInMilli, setTimeinMilli] = React.useState(0);
   const [lastOperation, setLastOperation] = React.useState('');
   let timeInMs = 0;
 
   const setItemSP = () => {
-    // setSpValue('');
-    // setAsyncValue('');
-    // setBSpValue('');
-
     setItemToSharedPrefs('JSI_Fetch', JSON.stringify(jsonData));
   };
   const getItemFromSP = () => {
@@ -39,9 +29,6 @@ export default function App() {
   };
 
   const setBItemSP = () => {
-    // setSpValue('');
-    // setAsyncValue('');
-    // setBSpValue('');
     setItemToSharedPrefsBridge('Bridge_Fetch', JSON.stringify(jsonData));
   };
   const getBItemFromSP = () => {
@@ -53,9 +40,6 @@ export default function App() {
   };
 
   const setItemAsyncStorage = () => {
-    // setSpValue('');
-    // setAsyncValue('');
-    // setBSpValue('');
     setItemToAsyncStorage('Async_Fetch', JSON.stringify(jsonData));
   };
 
@@ -66,10 +50,7 @@ export default function App() {
   const setItemToSharedPrefs = (key: string, value: string) => {
     const bench = Reactotron.benchmark('setItemToSharedPref');
     const timeStart = Date.now();
-
-    //-----
     setItem(key, value);
-    //-----
     const timeEnd = Date.now();
     timeInMs = timeEnd - timeStart;
     setTimeinMilli(timeInMs);
@@ -80,28 +61,21 @@ export default function App() {
   const getItemFromSharedPref = (key: string) => {
     const bench = Reactotron.benchmark('getItemFromSharedPref');
     const timeStart = Date.now();
-
-    //-----
     getItem(key, (value) => {
       const timeEnd = Date.now();
       timeInMs = timeEnd - timeStart;
-
       setTimeinMilli(timeInMs);
       setLastOperation('get From SP JSI');
       bench.stop();
       //setSpValue(value);
       console.log(value);
     });
-    //-----
   };
 
   const setItemToAsyncStorage = (key: string, value: string) => {
     const bench = Reactotron.benchmark('setItemToAsyncStorage');
     const timeStart = Date.now();
-    //-----
     AsyncStorage.setItem(key, value);
-    //-----
-
     const timeEnd = Date.now();
     timeInMs = timeEnd - timeStart;
     setTimeinMilli(timeInMs);
@@ -112,15 +86,12 @@ export default function App() {
   const getItemFromAsyncStorage = (key: string) => {
     const bench = Reactotron.benchmark('getItemFromAsyncStorage');
     const timeStart = Date.now();
-    //-----
     AsyncStorage.getItem(key).then((res) => {
-      //-----
       const timeEnd = Date.now();
       timeInMs = timeEnd - timeStart;
       setTimeinMilli(timeInMs);
       setLastOperation('get From Async Storage');
       bench.stop();
-      //setAsyncValue(res ? res : '');
       console.log(res);
     });
   };
@@ -128,10 +99,7 @@ export default function App() {
   const setItemToSharedPrefsBridge = (key: string, value: string) => {
     const bench = Reactotron.benchmark('setItemToSharedPrefBridge');
     const timeStart = Date.now();
-
-    //-----
     NativeModules.SharedPreferences.setItem(key, value);
-    //-----
     const timeEnd = Date.now();
     timeInMs = timeEnd - timeStart;
     setTimeinMilli(timeInMs);
@@ -142,8 +110,6 @@ export default function App() {
   const getItemFromSharedPrefBridge = (key: string) => {
     const bench = Reactotron.benchmark('getItemFromSharedPrefBridge');
     const timeStart = Date.now();
-
-    //-----
     NativeModules.SharedPreferences.getItem(key, (value) => {
       const timeEnd = Date.now();
       timeInMs = timeEnd - timeStart;
@@ -152,34 +118,24 @@ export default function App() {
       bench.stop();
       console.log(value);
     });
-
-    //-----
   };
 
   const getItemFromSharedPrefJSISync = (key: string) => {
     const bench = Reactotron.benchmark('getItemFromSharedPrefJSISync');
     const timeStart = Date.now();
-
-    //-----
     const value = getItemSync(key);
-
     const timeEnd = Date.now();
     timeInMs = timeEnd - timeStart;
     setTimeinMilli(timeInMs);
     setLastOperation('get From SP JSI Sync');
     bench.stop();
     console.log(value);
-    //-----
   };
 
   const getMessageFromJSIImp = (key: string) => {
     const bench = Reactotron.benchmark('getMessageFromJSI');
     const timeStart = Date.now();
-
     const message = getMessageFromJSI();
-    //-----
-    //-----
-
     const timeEnd = Date.now();
     timeInMs = timeEnd - timeStart;
     setTimeinMilli(timeInMs);
@@ -191,8 +147,6 @@ export default function App() {
   const getMessageFromNativeModule = (key: string) => {
     const bench = Reactotron.benchmark('getMessageFromNativeModule');
     const timeStart = Date.now();
-
-    //-----
     NativeModules.SharedPreferences.getBridgeMessage((value) => {
       const timeEnd = Date.now();
       timeInMs = timeEnd - timeStart;
@@ -201,14 +155,11 @@ export default function App() {
       bench.stop();
       console.log(value);
     });
-    //-----
   };
 
   const getObjectFromJavaAndroid = () => {
     const bench = Reactotron.benchmark('getObjectFromJavaAndroid');
     const timeStart = Date.now();
-
-    //-----
     const a = getObjectFromJava();
     const timeEnd = Date.now();
     timeInMs = timeEnd - timeStart;
@@ -216,15 +167,11 @@ export default function App() {
     setLastOperation('getObjectFromJavaAndroid');
     bench.stop();
     console.log(JSON.stringify(a));
-
-    //-----
   };
 
   const getObjectFromJavaAndroidBridge = () => {
     const bench = Reactotron.benchmark('getObjectFromJavaAndroidBridge');
     const timeStart = Date.now();
-
-    //-----
     NativeModules.SharedPreferences.getObjectFromJava((a) => {
       const timeEnd = Date.now();
       timeInMs = timeEnd - timeStart;
@@ -233,29 +180,22 @@ export default function App() {
       bench.stop();
       console.log(JSON.stringify(a));
     });
-    //-----
   };
 
   const addStudentsToDB = () => {
     const bench = Reactotron.benchmark('addStudentsToDB');
     const timeStart = Date.now();
-
-    //-----
     addStudentsToTable();
     const timeEnd = Date.now();
     timeInMs = timeEnd - timeStart;
     setTimeinMilli(timeInMs);
     setLastOperation('addStudentsToDB');
     bench.stop();
-
-    //-----
   };
 
   const getStudentsFromDB = () => {
     const bench = Reactotron.benchmark('getStudentsFromDB');
     const timeStart = Date.now();
-
-    //-----
     const students = getStudents();
     const timeEnd = Date.now();
     timeInMs = timeEnd - timeStart;
@@ -263,8 +203,6 @@ export default function App() {
     setLastOperation('getStudentsFromDB');
     bench.stop();
     console.log(JSON.stringify(students));
-
-    //-----
   };
 
   const addStudentsToDBBridge = () => {
@@ -272,23 +210,17 @@ export default function App() {
     const timeStart = Date.now();
 
     NativeModules.SharedPreferences.createStudents((value) => {
-      //-----
       const timeEnd = Date.now();
       timeInMs = timeEnd - timeStart;
       setTimeinMilli(timeInMs);
       setLastOperation('addStudentsToDBBridge');
       bench.stop();
     });
-
-    //-----
   };
 
   const getStudentsFromDBBridge = () => {
     const bench = Reactotron.benchmark('getStudentsFromDBBridge');
     const timeStart = Date.now();
-
-    //-----
-
     NativeModules.SharedPreferences.getAllStudents((result) => {
       const timeEnd = Date.now();
       timeInMs = timeEnd - timeStart;
@@ -297,11 +229,9 @@ export default function App() {
       bench.stop();
       console.log(JSON.stringify(result));
     });
-
-    //-----
   };
   return (
-    <View style={{flex:1}}>
+    <View style={{ flex: 1 }}>
       <Text>
         Last operation : {lastOperation} time: {timeInMilli} MS{' '}
       </Text>
@@ -323,10 +253,6 @@ export default function App() {
                 Get From Shared Prefs JSI (Async){' '}
               </Text>
             </TouchableHighlight>
-            {spValue ? (
-              <Text numberOfLines={2}>Value from SP: {spValue}</Text>
-            ) : null}
-
             <TouchableHighlight
               style={styles.backgroundButton}
               onPress={getItemFromSPSync}
@@ -336,9 +262,6 @@ export default function App() {
                 Get From Shared Prefs JSI (Sync){' '}
               </Text>
             </TouchableHighlight>
-            {spValue ? (
-              <Text numberOfLines={2}>Value from SP: {spValue}</Text>
-            ) : null}
           </View>
           <Text>---------------------------------</Text>
           <View style={styles.subContainer}>
@@ -357,11 +280,6 @@ export default function App() {
                 Get From Async Storage (Async)
               </Text>
             </TouchableHighlight>
-            {asyncValue ? (
-              <Text numberOfLines={2}>
-                Value from Async Storage: {asyncValue}
-              </Text>
-            ) : null}
           </View>
           <Text>---------------------------------</Text>
           <View style={styles.subContainer}>
@@ -375,14 +293,8 @@ export default function App() {
               style={styles.backgroundButton}
               onPress={getBItemFromSP}
             >
-              <Text style={styles.textButton}>
-                {' '}
-                Get From SP Bridge (Async){' '}
-              </Text>
+              <Text style={styles.textButton}>Get From SP Bridge (Async) </Text>
             </TouchableHighlight>
-            {spBValue ? (
-              <Text numberOfLines={2}>Value from SP Bridge SP: {spBValue}</Text>
-            ) : null}
           </View>
 
           <Text>---------------------------------</Text>
@@ -392,23 +304,18 @@ export default function App() {
               onPress={getMessageFromNativeModule}
             >
               <Text style={styles.textButton}>
-                {' '}
                 Load Android String From Bridge (Async)
               </Text>
             </TouchableHighlight>
-            {mativeModuleMessage ? (
-              <Text>Message From Bridge : {mativeModuleMessage}</Text>
-            ) : null}
+
             <TouchableHighlight
               style={styles.backgroundButton}
               onPress={getMessageFromJSIImp}
             >
               <Text style={styles.textButton}>
-                {' '}
                 Load Android String From JSI (Sync)
               </Text>
             </TouchableHighlight>
-            {jsiMessage ? <Text> Message From JSI : {jsiMessage}</Text> : null}
           </View>
           <Text>---------------------------------</Text>
 

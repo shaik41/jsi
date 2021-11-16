@@ -1,4 +1,4 @@
-package com.reactnativejsipoc;
+package com.reactnativejsipoc.db;
 
 public class Student {
   public static final String TABLE_NAME = "notes";

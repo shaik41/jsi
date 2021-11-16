@@ -10,6 +10,4 @@ void installJsiPoc(jsi::Runtime &rt);
 
 void cleanUpJsiPoc();
 
-int  multiplyFromiOS(int a, int b);
-
 #endif /* EXAMPLE_H */
