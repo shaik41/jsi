@@ -1,3 +1,11 @@
+# What is JSI?
+
+It's an interface which enables JavaScript (whether it's JSC or Hermes) to communicate with native (C++) and vice versa. 
+
+Hence using this we can eliminate the bridge. Instead we can take the following route.
+
+# Android : Java <-> JNI <-> JSI <-> Javascript 
+# iOS : ObjC <-> JSI <-> Javascript
 # Benchmarking JSI
 
 1. RN version: 0.63.4
@@ -5,7 +13,7 @@
 3. CMake Version: 3.10.x
 4. Test Device : Samsung S10
 
-Benchmark between
+# Operations
 1. Get String from KV store: 
     1. Android Shared Prefs over JSI
     2. Async Storage 
@@ -21,9 +29,9 @@ Benchmark between
     2. Bridge    
 
 
-Results:
+# Results:
 1. Get a JSON string of 212148 characters from KV Store 
-    1. JSI (Async - Thread Spawn)= ~ 5 MS (Min 2 MS - Max 8 MS)
+    1. JSI (Async - Spawn a thread on Java)= ~ 5 MS (Min 2 MS - Max 8 MS)
     2. JSI (Sync)= ~ 2 MS (Min 1 MS - Max 3 MS)
     3. Async Storage = ~ 22 MS (Min 12 - Max 35 MS))
     4. Bridge = ~ 14 MS (Min 8 MS - Max 20 MS)
