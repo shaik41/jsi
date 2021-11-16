@@ -3,16 +3,16 @@ package com.reactnativejsipoc;
  * Created by ravi on 20/02/18.
  */
 
-public class Note {
+public class Student {
   public static final String TABLE_NAME = "notes";
 
   public static final String COLUMN_ID = "id";
   public static final String COLUMN_NOTE = "note";
   public static final String COLUMN_TIMESTAMP = "timestamp";
 
-  private int id;
-  private String note;
-  private String timestamp;
+  public int id;
+  public String name;
+  public String timestamp;
 
 
   // Create table SQL query
@@ -23,12 +23,12 @@ public class Note {
       + COLUMN_TIMESTAMP + " DATETIME DEFAULT CURRENT_TIMESTAMP"
       + ")";
 
-  public Note() {
+  public Student() {
   }
 
-  public Note(int id, String note, String timestamp) {
+  public Student(int id, String name, String timestamp) {
     this.id = id;
-    this.note = note;
+    this.name = name;
     this.timestamp = timestamp;
   }
 
@@ -36,12 +36,12 @@ public class Note {
     return id;
   }
 
-  public String getNote() {
-    return note;
+  public String getName() {
+    return name;
   }
 
-  public void setNote(String note) {
-    this.note = note;
+  public void setName(String name) {
+    this.name = name;
   }
 
   public String getTimestamp() {

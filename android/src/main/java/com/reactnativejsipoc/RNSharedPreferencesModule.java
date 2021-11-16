@@ -15,6 +15,7 @@ import android.widget.ListView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class RNSharedPreferencesModule  extends ReactContextBaseJavaModule {
 
@@ -30,6 +31,7 @@ public class RNSharedPreferencesModule  extends ReactContextBaseJavaModule {
 
   private BroadcastReceiver bt_info_receiver = null;
   private Callback successCallback;
+  private DatabaseHelper db;
 
 
   public void onCreate(Bundle savedInstanceState) {
@@ -44,6 +46,8 @@ public class RNSharedPreferencesModule  extends ReactContextBaseJavaModule {
 
   public RNSharedPreferencesModule(ReactApplicationContext reactContext) {
     super(reactContext);
+    db = new DatabaseHelper(getReactApplicationContext());
+
   }
 
   @Override
@@ -159,7 +163,39 @@ public class RNSharedPreferencesModule  extends ReactContextBaseJavaModule {
     map.putString("Age","28");
     successCallback.invoke(map);
   }
+  /**
+   * Inserting new note in db
+   * and refreshing the list
+   */
+  @ReactMethod
+  public void createStudents(Callback successCallback) {
+    // inserting note in db and getting
+    // newly inserted note id
+    for(int i=0;i<100;i++) {
+      db.insertStudent(StudentNames.names[i]);
+    }
+    successCallback.invoke(true);
+  }
 
+  @ReactMethod
+  public void getAllStudents(Callback successCallback){
+    List<Student> students = db.getAllStudents();
+    WritableArray array = arrayOfObjectToWritableArray(students);
+    successCallback.invoke(array);
+  }
+
+  public static WritableArray arrayOfObjectToWritableArray(List<Student> studentList) {
+    WritableArray writableArray = Arguments.createArray();
+    for(int i=0; i < studentList.size(); i++) {
+      Student value = studentList.get(i);
+      WritableMap writableMap = new WritableNativeMap();
+      writableMap.putString("name", value.name);
+      writableMap.putString("timestamp", value.timestamp);
+      writableMap.putInt("id", value.id);
+      writableArray.pushMap(writableMap);
+    }
+    return writableArray;
+  }
 
 
   @ReactMethod

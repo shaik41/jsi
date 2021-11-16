@@ -23,9 +23,10 @@ Benchmark between
 
 Results:
 1. Get a JSON string of 212148 characters from KV Store 
-    1. JSI = ~ 5 MS (Min 2 MS - Max 8 MS)
-    2. Async Storage = ~ 15 MS (Min 12 - Max 35 MS))
-    3. Bridge = ~ 10 MS (Min 8 MS - Max 20 MS)
+    1. JSI (Async - Thread Spawn)= ~ 5 MS (Min 2 MS - Max 8 MS)
+    2. JSI (Sync)= ~ 2 MS (Min 1 MS - Max 3 MS)
+    3. Async Storage = ~ 22 MS (Min 12 - Max 35 MS))
+    4. Bridge = ~ 14 MS (Min 8 MS - Max 20 MS)
 
 2. Get a Java String to JS through JNI and JSI
     1. JSI = <= 1 MS (Min 0 MS - Max 1 MS)
@@ -33,11 +34,12 @@ Results:
 
 3. Get a Java Object (Two String properties) to JS through JNI and JSI 
     1. JSI = <= 1 MS (Min 0 MS - Max 1 MS)
-    2. Bridge = ~ 10 MS (Min 10 MS - Max 18 MS)
+    2. Bridge = ~ 14 MS (Min 10 MS - Max 18 MS)
 
-4. Query a row of students in a class table 
-    1. JSI - WIP
-    2. Bridge - WIP    
+4. Query 100 rows of students in a class table 
+    1. JSI = ~ 27 MS (Min 10 MS -  Max 44 MS )
+    2. Bridge = ~ 145 MS (Min 110 MS - Max 170 MS)
+
 ## License
 
 MIT

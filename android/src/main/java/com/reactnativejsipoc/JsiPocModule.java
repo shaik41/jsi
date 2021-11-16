@@ -9,21 +9,19 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.facebook.react.bridge.JavaScriptContextHolder;
-import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
-import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.module.annotations.ReactModule;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 @ReactModule(name = JsiPocModule.NAME)
 public class JsiPocModule extends ReactContextBaseJavaModule {
     public static final String NAME = "JsiPoc";
     public  JavaScriptContextHolder reactContextP;
-  private List<Note> notesList = new ArrayList<>();
+
+  private List<Student> notesList = new ArrayList<>();
     public JsiPocModule(ReactApplicationContext reactContext) {
         super(reactContext);
     }
@@ -91,6 +89,11 @@ public class JsiPocModule extends ReactContextBaseJavaModule {
     return "";
   }
 
+  public String getItemSync(final String key) {
+    SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getReactApplicationContext());
+    return preferences.getString(key, "");
+  }
+
   public String getJSIMessage(){
     return "HI I'M JSI ";
   }
@@ -105,18 +108,11 @@ public class JsiPocModule extends ReactContextBaseJavaModule {
    * Inserting new note in db
    * and refreshing the list
    */
-  private void createNote(String note) {
+  public void createStudents() {
     // inserting note in db and getting
     // newly inserted note id
-    long id = db.insertNote(note);
-
-    // get the newly inserted note from db
-    Note n = db.getNote(id);
-
-    if (n != null) {
-      // adding new note to array list at 0 position
-      notesList.add(0, n);
-
+    for(int i=0;i<100;i++) {
+     db.insertStudent(StudentNames.names[i]);
     }
   }
 
@@ -125,12 +121,12 @@ public class JsiPocModule extends ReactContextBaseJavaModule {
    * item in the list by its position
    */
   private void updateNote(String note, int position) {
-    Note n = notesList.get(position);
+    Student n = notesList.get(position);
     // updating note text
-    n.setNote(note);
+    n.setName(note);
 
     // updating note in db
-    db.updateNote(n);
+    db.updateStudent(n);
 
     // refreshing the list
     notesList.set(position, n);
@@ -143,10 +139,21 @@ public class JsiPocModule extends ReactContextBaseJavaModule {
    */
   private void deleteNote(int position) {
     // deleting the note from db
-    db.deleteNote(notesList.get(position));
+    db.deleteStudent(notesList.get(position));
 
     // removing the note from the list
     notesList.remove(position);
+  }
+
+  public Student getStudentFromName(String name){
+    return db.getStudentFromName(name);
+  }
+
+
+  public Student[] getAllStudents(){
+    List<Student> students = db.getAllStudents();
+    Student[] students1 = new Student[students.size()];
+    return students.toArray(students1);
   }
 
   private Person getObjectFromJava(){
@@ -201,6 +208,8 @@ public class JsiPocModule extends ReactContextBaseJavaModule {
       Age = age;
     }
   }
+
+
 
 }
 

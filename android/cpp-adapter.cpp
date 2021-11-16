@@ -297,6 +297,135 @@ void installFromAndroid(facebook::jsi::Runtime &jsiRuntime) {
     jsiRuntime.global().setProperty(jsiRuntime, "startAsyncTask",
                                     move(startAAsyncTask));
 
+
+
+    auto addStudentsToTable = Function::createFromHostFunction(jsiRuntime,
+                                                    PropNameID::forAscii(jsiRuntime,
+                                                                         "addStudentsToTable"),
+                                                    1,
+                                                    [](Runtime &runtime,
+                                                       const Value &thisValue,
+                                                       const Value *arguments,
+                                                       size_t count) -> Value {
+
+                                                        JNIEnv *jniEnv = GetJniEnv();
+
+                                                        java_class = jniEnv->GetObjectClass(
+                                                                java_object);
+
+
+                                                        jmethodID set = jniEnv->GetMethodID(
+                                                                java_class, "createStudents",
+                                                                "()V");
+
+                                                        jniEnv->CallVoidMethod(
+                                                                java_object, set);
+
+                                                        return Value(true);
+
+                                                    });
+
+    jsiRuntime.global().setProperty(jsiRuntime, "addStudentsToTable", move(addStudentsToTable));
+
+
+
+    auto getStudents = Function::createFromHostFunction(jsiRuntime,
+                                                              PropNameID::forAscii(jsiRuntime,
+                                                                                   "getStudent"),
+                                                              0,
+                                                              [](Runtime &runtime,
+                                                                 const Value &thisValue,
+                                                                 const Value *arguments,
+                                                                 size_t count) -> Value {
+
+                                                                  Array objectArray =Array(runtime,100);
+
+                                                                  JNIEnv *jniEnv = GetJniEnv();
+
+                                                                  java_class = jniEnv->GetObjectClass(
+                                                                          java_object);
+
+                                                                  jmethodID methodID = jniEnv->GetMethodID(
+                                                                          java_class, "getAllStudents",
+                                                                          "()[Lcom/reactnativejsipoc/Student;");
+
+
+                                                                  jobjectArray studentObjectArray = (jobjectArray) jniEnv->CallObjectMethod(
+                                                                          java_object, methodID);
+
+                                                                  for(int i=0;i<100;i++){
+                                                                      jvalue paramsForStudent[1];
+                                                                      paramsForStudent[0].i = i;
+                                                                      jobject studentObject = jniEnv->GetObjectArrayElement(studentObjectArray,i);
+
+                                                                      jclass studentClass =  jniEnv->GetObjectClass(studentObject);
+
+                                                                      //For name
+                                                                      jfieldID name = jniEnv->GetFieldID(studentClass,"name","Ljava/lang/String;");
+                                                                      jobject nameVal =jniEnv->GetObjectField(studentObject, name);
+                                                                      const char *strNameValue = jniEnv->GetStringUTFChars((jstring)nameVal, NULL);
+                                                                      //For timestamp
+                                                                      jfieldID timeStamp = jniEnv->GetFieldID(studentClass,"timestamp","Ljava/lang/String;");
+                                                                      jobject timeStampVal =jniEnv->GetObjectField(studentObject, timeStamp);
+                                                                      const char *strTimestampValue = jniEnv->GetStringUTFChars((jstring)timeStampVal, NULL);
+                                                                      //For id
+                                                                      jfieldID id = jniEnv->GetFieldID(studentClass,"id","I");
+                                                                      jint idValue =jniEnv->GetIntField(studentObject, id);
+
+                                                                      Object obj = Object(runtime);
+                                                                      obj.setProperty(runtime,"name",String::createFromUtf8(runtime,strNameValue));
+                                                                      obj.setProperty(runtime,"timestamp",String::createFromUtf8(runtime,strTimestampValue));
+                                                                      obj.setProperty(runtime,"id",Value(idValue));
+
+                                                                      objectArray.setValueAtIndex(runtime,i,obj);
+                                                                  }
+
+                                                                  return Value(runtime, objectArray);
+                                                              });
+
+    jsiRuntime.global().setProperty(jsiRuntime, "getStudents", move(getStudents));
+
+
+
+
+    auto getItemSync = Function::createFromHostFunction(jsiRuntime,
+                                                    PropNameID::forAscii(jsiRuntime,
+                                                                         "getItemSync"),
+                                                    1,
+                                                    [](Runtime &runtime,
+                                                       const Value &thisValue,
+                                                       const Value *arguments,
+                                                       size_t count) -> Value {
+
+                                                        string key = arguments[0].getString(
+                                                                        runtime)
+                                                                .utf8(
+                                                                        runtime);
+
+                                                        JNIEnv *jniEnv = GetJniEnv();
+
+                                                        java_class = jniEnv->GetObjectClass(
+                                                                java_object);
+                                                        jmethodID get = jniEnv->GetMethodID(
+                                                                java_class, "getItemSync",
+                                                                "(Ljava/lang/String;)Ljava/lang/String;");
+
+                                                        jstring jstr1 = string2jstring(jniEnv,
+                                                                                       key);
+                                                        jvalue params[1];
+                                                        params[0].l = jstr1;
+
+                                                        jobject result = jniEnv->CallObjectMethodA(
+                                                                java_object, get, params);
+
+                                                        const char *str = jniEnv->GetStringUTFChars((jstring)result, NULL);
+
+                                                        return Value(runtime, String::createFromUtf8(runtime, str));
+                                                    });
+
+    jsiRuntime.global().setProperty(jsiRuntime, "getItemSync", move(getItemSync));
+
+
 }
 
 

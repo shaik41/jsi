@@ -6,8 +6,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.reactnativejsipoc.Note;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,30 +32,30 @@ public class DatabaseHelper extends SQLiteOpenHelper {
   public void onCreate(SQLiteDatabase db) {
 
     // create notes table
-    db.execSQL(Note.CREATE_TABLE);
+    db.execSQL(Student.CREATE_TABLE);
   }
 
   // Upgrading database
   @Override
   public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
     // Drop older table if existed
-    db.execSQL("DROP TABLE IF EXISTS " + Note.TABLE_NAME);
+    db.execSQL("DROP TABLE IF EXISTS " + Student.TABLE_NAME);
 
     // Create tables again
     onCreate(db);
   }
 
-  public long insertNote(String note) {
+  public long insertStudent(String student) {
     // get writable database as we want to write data
     SQLiteDatabase db = this.getWritableDatabase();
 
     ContentValues values = new ContentValues();
     // `id` and `timestamp` will be inserted automatically.
     // no need to add them
-    values.put(Note.COLUMN_NOTE, note);
+    values.put(Student.COLUMN_NOTE, student);
 
     // insert row
-    long id = db.insert(Note.TABLE_NAME, null, values);
+    long id = db.insert(Student.TABLE_NAME, null, values);
 
     // close db connection
     db.close();
@@ -66,36 +64,61 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     return id;
   }
 
-  public Note getNote(long id) {
+  public Student getStudent(long id) {
     // get readable database as we are not inserting anything
     SQLiteDatabase db = this.getReadableDatabase();
 
-    Cursor cursor = db.query(Note.TABLE_NAME,
-      new String[]{Note.COLUMN_ID, Note.COLUMN_NOTE, Note.COLUMN_TIMESTAMP},
-      Note.COLUMN_ID + "=?",
+    Cursor cursor = db.query(Student.TABLE_NAME,
+      new String[]{Student.COLUMN_ID, Student.COLUMN_NOTE, Student.COLUMN_TIMESTAMP},
+      Student.COLUMN_ID + "=?",
       new String[]{String.valueOf(id)}, null, null, null, null);
 
     if (cursor != null)
       cursor.moveToFirst();
 
     // prepare note object
-    Note note = new Note(
-      cursor.getInt(cursor.getColumnIndex(Note.COLUMN_ID)),
-      cursor.getString(cursor.getColumnIndex(Note.COLUMN_NOTE)),
-      cursor.getString(cursor.getColumnIndex(Note.COLUMN_TIMESTAMP)));
+    Student student = new Student(
+      cursor.getInt(cursor.getColumnIndex(Student.COLUMN_ID)),
+      cursor.getString(cursor.getColumnIndex(Student.COLUMN_NOTE)),
+      cursor.getString(cursor.getColumnIndex(Student.COLUMN_TIMESTAMP)));
 
     // close the db connection
     cursor.close();
 
-    return note;
+    return student;
   }
 
-  public List<Note> getAllNotes() {
-    List<Note> notes = new ArrayList<>();
+
+  public Student getStudentFromName(String name) {
+    // get readable database as we are not inserting anything
+    SQLiteDatabase db = this.getReadableDatabase();
+
+    Cursor cursor = db.query(Student.TABLE_NAME,
+      new String[]{Student.COLUMN_ID, Student.COLUMN_NOTE, Student.COLUMN_TIMESTAMP},
+      Student.COLUMN_NOTE + "=?",
+      new String[]{String.valueOf(name)}, null, null, null, null);
+
+    if (cursor != null)
+      cursor.moveToFirst();
+
+    // prepare note object
+    Student student = new Student(
+      cursor.getInt(cursor.getColumnIndex(Student.COLUMN_ID)),
+      cursor.getString(cursor.getColumnIndex(Student.COLUMN_NOTE)),
+      cursor.getString(cursor.getColumnIndex(Student.COLUMN_TIMESTAMP)));
+
+    // close the db connection
+    cursor.close();
+
+    return student;
+  }
+
+  public List<Student> getAllStudents() {
+    List<Student> students = new ArrayList<>();
 
     // Select All Query
-    String selectQuery = "SELECT  * FROM " + Note.TABLE_NAME + " ORDER BY " +
-      Note.COLUMN_TIMESTAMP + " DESC";
+    String selectQuery = "SELECT  * FROM " + Student.TABLE_NAME + " ORDER BY " +
+      Student.COLUMN_TIMESTAMP + " DESC";
 
     SQLiteDatabase db = this.getWritableDatabase();
     Cursor cursor = db.rawQuery(selectQuery, null);
@@ -103,12 +126,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     // looping through all rows and adding to list
     if (cursor.moveToFirst()) {
       do {
-        Note note = new Note();
-        note.setId(cursor.getInt(cursor.getColumnIndex(Note.COLUMN_ID)));
-        note.setNote(cursor.getString(cursor.getColumnIndex(Note.COLUMN_NOTE)));
-        note.setTimestamp(cursor.getString(cursor.getColumnIndex(Note.COLUMN_TIMESTAMP)));
+        Student student = new Student();
+        student.setId(cursor.getInt(cursor.getColumnIndex(Student.COLUMN_ID)));
+        student.setName(cursor.getString(cursor.getColumnIndex(Student.COLUMN_NOTE)));
+        student.setTimestamp(cursor.getString(cursor.getColumnIndex(Student.COLUMN_TIMESTAMP)));
 
-        notes.add(note);
+        students.add(student);
       } while (cursor.moveToNext());
     }
 
@@ -116,11 +139,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     db.close();
 
     // return notes list
-    return notes;
+    return students;
   }
 
-  public int getNotesCount() {
-    String countQuery = "SELECT  * FROM " + Note.TABLE_NAME;
+  public int getStudentCount() {
+    String countQuery = "SELECT  * FROM " + Student.TABLE_NAME;
     SQLiteDatabase db = this.getReadableDatabase();
     Cursor cursor = db.rawQuery(countQuery, null);
 
@@ -132,21 +155,21 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     return count;
   }
 
-  public int updateNote(Note note) {
+  public int updateStudent(Student student) {
     SQLiteDatabase db = this.getWritableDatabase();
 
     ContentValues values = new ContentValues();
-    values.put(Note.COLUMN_NOTE, note.getNote());
+    values.put(Student.COLUMN_NOTE, student.getName());
 
     // updating row
-    return db.update(Note.TABLE_NAME, values, Note.COLUMN_ID + " = ?",
-      new String[]{String.valueOf(note.getId())});
+    return db.update(Student.TABLE_NAME, values, Student.COLUMN_ID + " = ?",
+      new String[]{String.valueOf(student.getId())});
   }
 
-  public void deleteNote(Note note) {
+  public void deleteStudent(Student student) {
     SQLiteDatabase db = this.getWritableDatabase();
-    db.delete(Note.TABLE_NAME, Note.COLUMN_ID + " = ?",
-      new String[]{String.valueOf(note.getId())});
+    db.delete(Student.TABLE_NAME, Student.COLUMN_ID + " = ?",
+      new String[]{String.valueOf(student.getId())});
     db.close();
   }
 }
