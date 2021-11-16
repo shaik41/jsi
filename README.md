@@ -4,7 +4,7 @@ It's an interface which enables JavaScript (whether it's JSC or Hermes) to commu
 
 Hence using this we can eliminate the bridge. Instead we can take the following route.
 
-Android : Java <-> JNI <-> JSI <-> Javascript. 
+Android : Java <-> JNI <-> JSI <-> Javascript.\
 iOS : ObjC <-> JSI <-> Javascript.
 # Benchmarking JSI
 
