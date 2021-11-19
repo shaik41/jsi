@@ -44,9 +44,10 @@ iOS : ObjC <-> JSI <-> Javascript.
     1. JSI = <= 1 MS (Min 0 MS - Max 1 MS)
     2. Bridge = ~ 14 MS (Min 10 MS - Max 18 MS)
 
-4. Query 100 rows of students in a class table 
-    1. JSI = ~ 27 MS (Min 10 MS -  Max 44 MS )
-    2. Bridge = ~ 145 MS (Min 110 MS - Max 170 MS)
+4. Query 100 rows of students in a class table - (Query time is ~ 5-10 MS)
+    1. JSI = ~ 15 MS (Min 10 MS -  Max 20 MS ) - Cursor iteration on Java.
+    2. JSI = ~ 22 MS (Min 15 MS - Max 30 MS) - Cursor iteration on JS. 
+    2. Bridge = ~ 45 MS (Min 30 MS - Max 60 MS)
 
 ## License
 

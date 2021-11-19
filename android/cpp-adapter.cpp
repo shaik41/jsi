@@ -12,7 +12,16 @@ using namespace std;
 JavaVM *java_vm;
 jclass java_class;
 jobject java_object;
+jobject cursorObject;
+jclass cursor_object_class;
 
+JNIEnv *jniEnvTest;
+jmethodID getMoveToFirstMethodID;
+jmethodID getMoveToNextMethodID;
+jmethodID getIntMethodID;
+jmethodID getStringMethodID;
+jmethodID getColumnIndexMethodID;
+jmethodID closeMethodID;
 Runtime *runT;
 
 /**
@@ -169,6 +178,8 @@ void installFromAndroid(facebook::jsi::Runtime &jsiRuntime) {
                                                         JNIEnv *jniEnv = GetJniEnv();
 
                                                         auto obj = arguments[1].getObject(runtime);
+
+
 
                                                         runtime.global().setProperty(runtime,
                                                                                      "callback",
@@ -376,6 +387,7 @@ void installFromAndroid(facebook::jsi::Runtime &jsiRuntime) {
                                                                 jint idValue = jniEnv->GetIntField(
                                                                         studentObject, id);
 
+
                                                                 Object obj = Object(runtime);
                                                                 obj.setProperty(runtime, "name",
                                                                                 String::createFromUtf8(
@@ -397,6 +409,210 @@ void installFromAndroid(facebook::jsi::Runtime &jsiRuntime) {
                                                         });
 
     jsiRuntime.global().setProperty(jsiRuntime, "getStudents", move(getStudents));
+
+
+
+
+    auto getStudentsCursor = Function::createFromHostFunction(jsiRuntime,
+                                                        PropNameID::forAscii(jsiRuntime,
+                                                                             "getStudentsCursor"),
+                                                        0,
+                                                        [](Runtime &runtime,
+                                                           const Value &thisValue,
+                                                           const Value *arguments,
+                                                           size_t count) -> Value {
+
+                                                            Array objectArray = Array(runtime, 100);
+
+                                                            JNIEnv *jniEnv = GetJniEnv();
+                                                            jniEnvTest = jniEnv;
+
+                                                            java_class = jniEnv->GetObjectClass(
+                                                                    java_object);
+
+                                                            jmethodID methodID = jniEnv->GetMethodID(
+                                                                    java_class, "getAllStudentsCursor",
+                                                                    "()Landroid/database/Cursor;");
+
+
+                                                            cursorObject =  jniEnv->CallObjectMethod(
+                                                                    java_object, methodID);
+
+                                                            cursor_object_class = jniEnv->GetObjectClass(
+                                                                    cursorObject);
+
+                                                            getMoveToFirstMethodID = jniEnvTest->GetMethodID(
+                                                                    cursor_object_class, "moveToFirst",
+                                                                    "()Z");
+
+                                                            getMoveToNextMethodID = jniEnvTest->GetMethodID(
+                                                                    cursor_object_class, "moveToNext",
+                                                                    "()Z");
+
+                                                            getIntMethodID = jniEnvTest->GetMethodID(
+                                                                    cursor_object_class, "getInt",
+                                                                    "(I)I");
+
+                                                            getStringMethodID = jniEnvTest->GetMethodID(
+                                                                    cursor_object_class, "getString",
+                                                                    "(I)Ljava/lang/String;");
+
+                                                            getColumnIndexMethodID = jniEnvTest->GetMethodID(
+                                                                    cursor_object_class, "getColumnIndex",
+                                                                    "(Ljava/lang/String;)I");
+
+                                                            closeMethodID = jniEnvTest->GetMethodID(
+                                                                    cursor_object_class, "close",
+                                                                    "()V");
+
+                                                            auto moveToFirst = Function::createFromHostFunction(runtime,
+                                                                                                                      PropNameID::forAscii(runtime,
+                                                                                                                                           "moveToFirst"),
+                                                                                                                      0,
+                                                                                                                      [](Runtime &runtime,
+                                                                                                                         const Value &thisValue,
+                                                                                                                         const Value *arguments,
+                                                                                                                         size_t count) -> Value{
+
+
+                                                                                                                          jboolean moveToFirst = jniEnvTest->CallBooleanMethod(cursorObject,getMoveToFirstMethodID);
+                                                                                                                          bool moveToFirstJNI =  (bool)(moveToFirst == JNI_TRUE);
+                                                                                                                          return Value(moveToFirstJNI);
+                                                                                                                      });
+
+                                                            auto moveToNext = Function::createFromHostFunction(runtime,
+                                                                                                                PropNameID::forAscii(runtime,
+                                                                                                                                     "moveToNext"),
+                                                                                                                0,
+                                                                                                                [](Runtime &runtime,
+                                                                                                                   const Value &thisValue,
+                                                                                                                   const Value *arguments,
+                                                                                                                   size_t count) -> Value{
+
+
+                                                                                                                    jboolean moveToNext = jniEnvTest->CallBooleanMethod(cursorObject,getMoveToNextMethodID);
+                                                                                                                   bool moveToNextJNI =  (bool)(moveToNext == JNI_TRUE);
+                                                                                                                    return Value(moveToNextJNI);
+                                                                                                                });
+
+
+                                                            auto getInt = Function::createFromHostFunction(runtime,
+                                                                                                                PropNameID::forAscii(runtime,
+                                                                                                                                     "getInt"),
+                                                                                                                1,
+                                                                                                                [](Runtime &runtime,
+                                                                                                                   const Value &thisValue,
+                                                                                                                   const Value *arguments,
+                                                                                                                   size_t count) -> Value{
+
+
+                                                                                                                    string key = arguments[0].getString(
+                                                                                                                                    runtime)
+                                                                                                                            .utf8(
+                                                                                                                                    runtime);
+
+                                                                                                                    jstring jstr1 = string2jstring(jniEnvTest,
+                                                                                                                                                   key);
+                                                                                                                    jvalue params2[1];
+                                                                                                                    params2[0].l = jstr1;
+
+                                                                                                                    jint columnIndex = jniEnvTest->CallIntMethodA(cursorObject,getColumnIndexMethodID,params2);
+
+
+                                                                                                                    jvalue params[1];
+                                                                                                                    params[0].i = columnIndex;
+
+                                                                                                                    jint intValue = jniEnvTest->CallIntMethodA(cursorObject,getIntMethodID,params);
+
+                                                                                                                    return Value(intValue);
+                                                                                                                });
+
+                                                            auto getString = Function::createFromHostFunction(runtime,
+                                                                                                           PropNameID::forAscii(runtime,
+                                                                                                                                "getString"),
+                                                                                                           1,
+                                                                                                           [](Runtime &runtime,
+                                                                                                              const Value &thisValue,
+                                                                                                              const Value *arguments,
+                                                                                                              size_t count) -> Value{
+                                                                                                               string key = arguments[0].getString(
+                                                                                                                               runtime)
+                                                                                                                       .utf8(
+                                                                                                                               runtime);
+
+                                                                                                               jstring jstr1 = string2jstring(jniEnvTest,
+                                                                                                                                              key);
+                                                                                                               jvalue params2[1];
+                                                                                                               params2[0].l = jstr1;
+
+                                                                                                               jint columnIndex = jniEnvTest->CallIntMethodA(cursorObject,getColumnIndexMethodID,params2);
+
+
+                                                                                                               jvalue params[1];
+                                                                                                               params[0].i = columnIndex;
+
+                                                                                                               jobject stringValueJNI = jniEnvTest->CallObjectMethodA(cursorObject,getStringMethodID,params);
+                                                                                                               const char *stringVal = jniEnvTest->GetStringUTFChars(
+                                                                                                                       (jstring) stringValueJNI,
+                                                                                                                       NULL);
+
+                                                                                                               return Value(runtime, String::createFromUtf8(
+                                                                                                                       runtime, stringVal));
+                                                                                                           });
+
+
+
+                                                            auto getColumnIndex = Function::createFromHostFunction(runtime,
+                                                                                                           PropNameID::forAscii(runtime,
+                                                                                                                                "getColumnIndex"),
+                                                                                                           1,
+                                                                                                           [](Runtime &runtime,
+                                                                                                              const Value &thisValue,
+                                                                                                              const Value *arguments,
+                                                                                                              size_t count) -> Value{
+
+                                                                                                               string key = arguments[0].getString(
+                                                                                                                               runtime)
+                                                                                                                       .utf8(
+                                                                                                                               runtime);
+
+                                                                                                               jstring jstr1 = string2jstring(jniEnvTest,
+                                                                                                                                              key);
+                                                                                                               jvalue params[1];
+                                                                                                               params[0].l = jstr1;
+
+                                                                                                               jint columnIndex = jniEnvTest->CallIntMethodA(cursorObject,getColumnIndexMethodID,params);
+
+                                                                                                               return Value(columnIndex);
+                                                                                                           });
+                                                            auto close = Function::createFromHostFunction(runtime,
+                                                                                                               PropNameID::forAscii(runtime,
+                                                                                                                                    "close"),
+                                                                                                               0,
+                                                                                                               [](Runtime &runtime,
+                                                                                                                  const Value &thisValue,
+                                                                                                                  const Value *arguments,
+                                                                                                                  size_t count) -> Value{
+
+
+                                                                                                                   jniEnvTest->CallVoidMethod(cursorObject,closeMethodID);
+                                                                                                                   return Value();
+                                                                                                               });
+
+                                                            Object obj = Object(runtime);
+                                                            obj.setProperty(runtime,"moveToFirst",move(moveToFirst));
+                                                            obj.setProperty(runtime,"getColumnIndex",move(getColumnIndex));
+                                                            obj.setProperty(runtime,"getInt",move(getInt));
+                                                            obj.setProperty(runtime,"getString",move(getString));
+                                                            obj.setProperty(runtime,"moveToNext",move(moveToNext));
+                                                            obj.setProperty(runtime,"close",move(close));
+
+                                                            return Value(runtime, obj);
+                                                        });
+
+    jsiRuntime.global().setProperty(jsiRuntime, "getStudentsCursor", move(getStudentsCursor));
+
+
 
 
 }

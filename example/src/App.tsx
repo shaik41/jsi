@@ -230,6 +230,29 @@ export default function App() {
       console.log(JSON.stringify(result));
     });
   };
+
+  const getCursorOfQuery = () => {
+    const bench = Reactotron.benchmark('getCursorOfQuery');
+    const timeStart = Date.now();
+    const cursor = getStudentsCursor();
+    const studentArray = [];
+    cursor.moveToFirst();
+    do {
+      const student = {
+        id: cursor.getInt('id'),
+        name: cursor.getString('note'),
+        timestamp: cursor.getString('timestamp'),
+      };
+      studentArray.push(student);
+    } while (cursor.moveToNext());
+    const timeEnd = Date.now();
+    timeInMs = timeEnd - timeStart;
+    setTimeinMilli(timeInMs);
+    setLastOperation('getCursorOfQuery');
+    bench.stop();
+    console.log(studentArray);
+  };
+
   return (
     <View style={{ flex: 1 }}>
       <Text>
@@ -364,6 +387,14 @@ export default function App() {
             onPress={getStudentsFromDBBridge}
           >
             <Text style={styles.textButton}>Get Students from DB Bridge </Text>
+          </TouchableHighlight>
+
+          <Text>---------------------------------</Text>
+          <TouchableHighlight
+            style={styles.backgroundButton}
+            onPress={getCursorOfQuery}
+          >
+            <Text style={styles.textButton}>Get Cursor of Query</Text>
           </TouchableHighlight>
         </View>
       </ScrollView>

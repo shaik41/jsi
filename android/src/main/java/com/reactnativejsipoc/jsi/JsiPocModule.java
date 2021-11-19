@@ -1,6 +1,7 @@
 package com.reactnativejsipoc.jsi;
 
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.preference.PreferenceManager;
@@ -111,6 +112,10 @@ public class JsiPocModule extends ReactContextBaseJavaModule {
     return students.toArray(students1);
   }
 
+
+  public Cursor getAllStudentsCursor(){
+   return db.getAllStudentCursor();
+  }
 
   private final class FetchFromSharedPref extends AsyncTask<String, String, String> {
 

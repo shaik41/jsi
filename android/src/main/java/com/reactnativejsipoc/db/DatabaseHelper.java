@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -114,11 +115,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     List<Student> students = new ArrayList<>();
 
     // Select All Query
-    String selectQuery = "SELECT  * FROM " + Student.TABLE_NAME + " ORDER BY " +
-      Student.COLUMN_TIMESTAMP + " DESC";
+    String selectQuery = "SELECT  * FROM " + Student.TABLE_NAME;
+
+    long timestart = System.currentTimeMillis();
 
     SQLiteDatabase db = this.getWritableDatabase();
+
     Cursor cursor = db.rawQuery(selectQuery, null);
+    long timeEnd = System.currentTimeMillis();
+    Log.e("QUERY_TIME", String.valueOf(timeEnd-timestart));
+
 
     // looping through all rows and adding to list
     if (cursor.moveToFirst()) {
@@ -137,6 +143,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     // return notes list
     return students;
+  }
+
+
+  public Cursor getAllStudentCursor() {
+    // Select All Query
+    String selectQuery = "SELECT  * FROM " + Student.TABLE_NAME;
+    SQLiteDatabase db = this.getReadableDatabase();
+    Cursor cursor =  db.rawQuery(selectQuery, null);
+    return cursor;
   }
 
   public int getStudentCount() {
