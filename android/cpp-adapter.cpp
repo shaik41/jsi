@@ -413,9 +413,9 @@ void installFromAndroid(facebook::jsi::Runtime &jsiRuntime) {
 
 
 
-    auto getStudentsCursor = Function::createFromHostFunction(jsiRuntime,
+    auto getCursorForQuery = Function::createFromHostFunction(jsiRuntime,
                                                         PropNameID::forAscii(jsiRuntime,
-                                                                             "getStudentsCursor"),
+                                                                             "getCursorForQuery"),
                                                         1,
                                                         [](Runtime &runtime,
                                                            const Value &thisValue,
@@ -620,7 +620,7 @@ void installFromAndroid(facebook::jsi::Runtime &jsiRuntime) {
                                                             return Value(runtime, obj);
                                                         });
 
-    jsiRuntime.global().setProperty(jsiRuntime, "getStudentsCursor", move(getStudentsCursor));
+    jsiRuntime.global().setProperty(jsiRuntime, "getCursorForQuery", move(getCursorForQuery));
 
 
 

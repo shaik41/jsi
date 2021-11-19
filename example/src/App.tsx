@@ -234,7 +234,7 @@ export default function App() {
   const getCursorOfQuery = () => {
     const bench = Reactotron.benchmark('getCursorOfQuery');
     const timeStart = Date.now();
-    const cursor = getStudentsCursor('SELECT * from students');
+    const cursor = getCursorForQuery('SELECT * from students');
     const studentArray = [];
     cursor.moveToFirst();
     do {
