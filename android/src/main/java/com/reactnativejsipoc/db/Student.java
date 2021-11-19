@@ -1,7 +1,7 @@
 package com.reactnativejsipoc.db;
 
 public class Student {
-  public static final String TABLE_NAME = "notes";
+  public static final String TABLE_NAME = "students";
 
   public static final String COLUMN_ID = "id";
   public static final String COLUMN_NOTE = "note";

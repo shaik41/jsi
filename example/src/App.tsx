@@ -234,7 +234,7 @@ export default function App() {
   const getCursorOfQuery = () => {
     const bench = Reactotron.benchmark('getCursorOfQuery');
     const timeStart = Date.now();
-    const cursor = getStudentsCursor();
+    const cursor = getStudentsCursor('SELECT * from students');
     const studentArray = [];
     cursor.moveToFirst();
     do {
@@ -245,10 +245,11 @@ export default function App() {
       };
       studentArray.push(student);
     } while (cursor.moveToNext());
+    cursor.close();
     const timeEnd = Date.now();
     timeInMs = timeEnd - timeStart;
     setTimeinMilli(timeInMs);
-    setLastOperation('getCursorOfQuery');
+    setLastOperation('get Students using cursor from JSI');
     bench.stop();
     console.log(studentArray);
   };
@@ -394,7 +395,9 @@ export default function App() {
             style={styles.backgroundButton}
             onPress={getCursorOfQuery}
           >
-            <Text style={styles.textButton}>Get Cursor of Query</Text>
+            <Text style={styles.textButton}>
+              Get Students from DB JSI using Cursor
+            </Text>
           </TouchableHighlight>
         </View>
       </ScrollView>

@@ -18,7 +18,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
   private static final int DATABASE_VERSION = 1;
 
   // Database Name
-  private static final String DATABASE_NAME = "notes_db";
+  private static final String DATABASE_NAME = "students_db";
 
 
   public DatabaseHelper(Context context) {
@@ -43,7 +43,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     onCreate(db);
   }
 
-  public long insertStudent(String student) {
+  public void insertStudent(String student) {
     // get writable database as we want to write data
     SQLiteDatabase db = this.getWritableDatabase();
 
@@ -53,78 +53,41 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     values.put(Student.COLUMN_NOTE, student);
 
     // insert row
-    long id = db.insert(Student.TABLE_NAME, null, values);
+    db.insert(Student.TABLE_NAME, null, values);
 
     // close db connection
     db.close();
 
-    // return newly inserted row id
-    return id;
   }
 
-  public Student getStudent(long id) {
-    // get readable database as we are not inserting anything
+
+  /**
+   * Approach 1:
+   * The aim here is to have full control on React Native side.
+   * This returns a cursor which is exposed to React Native through JSI.
+   * @param query
+   * @return
+   */
+  public Cursor getCursorForQuery(String query){
     SQLiteDatabase db = this.getReadableDatabase();
-
-    Cursor cursor = db.query(Student.TABLE_NAME,
-      new String[]{Student.COLUMN_ID, Student.COLUMN_NOTE, Student.COLUMN_TIMESTAMP},
-      Student.COLUMN_ID + "=?",
-      new String[]{String.valueOf(id)}, null, null, null, null);
-
-    if (cursor != null)
-      cursor.moveToFirst();
-
-    // prepare note object
-    Student student = new Student(
-      cursor.getInt(cursor.getColumnIndex(Student.COLUMN_ID)),
-      cursor.getString(cursor.getColumnIndex(Student.COLUMN_NOTE)),
-      cursor.getString(cursor.getColumnIndex(Student.COLUMN_TIMESTAMP)));
-
-    // close the db connection
-    cursor.close();
-
-    return student;
+    return db.rawQuery(query, null);
   }
 
-
-  public Student getStudentFromName(String name) {
-    // get readable database as we are not inserting anything
-    SQLiteDatabase db = this.getReadableDatabase();
-
-    Cursor cursor = db.query(Student.TABLE_NAME,
-      new String[]{Student.COLUMN_ID, Student.COLUMN_NOTE, Student.COLUMN_TIMESTAMP},
-      Student.COLUMN_NOTE + "=?",
-      new String[]{String.valueOf(name)}, null, null, null, null);
-
-    if (cursor != null)
-      cursor.moveToFirst();
-
-    // prepare note object
-    Student student = new Student(
-      cursor.getInt(cursor.getColumnIndex(Student.COLUMN_ID)),
-      cursor.getString(cursor.getColumnIndex(Student.COLUMN_NOTE)),
-      cursor.getString(cursor.getColumnIndex(Student.COLUMN_TIMESTAMP)));
-
-    // close the db connection
-    cursor.close();
-
-    return student;
-  }
-
+  /**
+   * Approach 2:
+   * The aim here is to keep control on Platform side.
+   * The cursor iterates and provides a list of known objects to React Native through JSI.
+   * @return
+   */
   public List<Student> getAllStudents() {
     List<Student> students = new ArrayList<>();
-
     // Select All Query
     String selectQuery = "SELECT  * FROM " + Student.TABLE_NAME;
-
     long timestart = System.currentTimeMillis();
-
     SQLiteDatabase db = this.getWritableDatabase();
-
     Cursor cursor = db.rawQuery(selectQuery, null);
     long timeEnd = System.currentTimeMillis();
     Log.e("QUERY_TIME", String.valueOf(timeEnd-timestart));
-
 
     // looping through all rows and adding to list
     if (cursor.moveToFirst()) {
@@ -138,6 +101,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
       } while (cursor.moveToNext());
     }
 
+    // close the cursor
+    cursor.close();
+
     // close db connection
     db.close();
 
@@ -146,42 +112,4 @@ public class DatabaseHelper extends SQLiteOpenHelper {
   }
 
 
-  public Cursor getAllStudentCursor() {
-    // Select All Query
-    String selectQuery = "SELECT  * FROM " + Student.TABLE_NAME;
-    SQLiteDatabase db = this.getReadableDatabase();
-    Cursor cursor =  db.rawQuery(selectQuery, null);
-    return cursor;
-  }
-
-  public int getStudentCount() {
-    String countQuery = "SELECT  * FROM " + Student.TABLE_NAME;
-    SQLiteDatabase db = this.getReadableDatabase();
-    Cursor cursor = db.rawQuery(countQuery, null);
-
-    int count = cursor.getCount();
-    cursor.close();
-
-
-    // return count
-    return count;
-  }
-
-  public int updateStudent(Student student) {
-    SQLiteDatabase db = this.getWritableDatabase();
-
-    ContentValues values = new ContentValues();
-    values.put(Student.COLUMN_NOTE, student.getName());
-
-    // updating row
-    return db.update(Student.TABLE_NAME, values, Student.COLUMN_ID + " = ?",
-      new String[]{String.valueOf(student.getId())});
-  }
-
-  public void deleteStudent(Student student) {
-    SQLiteDatabase db = this.getWritableDatabase();
-    db.delete(Student.TABLE_NAME, Student.COLUMN_ID + " = ?",
-      new String[]{String.valueOf(student.getId())});
-    db.close();
-  }
 }

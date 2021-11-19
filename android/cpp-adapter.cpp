@@ -416,13 +416,18 @@ void installFromAndroid(facebook::jsi::Runtime &jsiRuntime) {
     auto getStudentsCursor = Function::createFromHostFunction(jsiRuntime,
                                                         PropNameID::forAscii(jsiRuntime,
                                                                              "getStudentsCursor"),
-                                                        0,
+                                                        1,
                                                         [](Runtime &runtime,
                                                            const Value &thisValue,
                                                            const Value *arguments,
                                                            size_t count) -> Value {
 
-                                                            Array objectArray = Array(runtime, 100);
+                                                            string key = arguments[0].getString(
+                                                                            runtime)
+                                                                    .utf8(
+                                                                            runtime);
+
+
 
                                                             JNIEnv *jniEnv = GetJniEnv();
                                                             jniEnvTest = jniEnv;
@@ -431,12 +436,17 @@ void installFromAndroid(facebook::jsi::Runtime &jsiRuntime) {
                                                                     java_object);
 
                                                             jmethodID methodID = jniEnv->GetMethodID(
-                                                                    java_class, "getAllStudentsCursor",
-                                                                    "()Landroid/database/Cursor;");
+                                                                    java_class, "getCursorForQuery",
+                                                                    "(Ljava/lang/String;)Landroid/database/Cursor;");
 
+                                                            jstring jstr1 = string2jstring(jniEnvTest,
+                                                                                           key);
 
-                                                            cursorObject =  jniEnv->CallObjectMethod(
-                                                                    java_object, methodID);
+                                                            jvalue params2[1];
+                                                            params2[0].l = jstr1;
+
+                                                            cursorObject =  jniEnv->CallObjectMethodA(
+                                                                    java_object, methodID,params2);
 
                                                             cursor_object_class = jniEnv->GetObjectClass(
                                                                     cursorObject);

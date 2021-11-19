@@ -105,6 +105,10 @@ public class JsiPocModule extends ReactContextBaseJavaModule {
     }
   }
 
+  public Cursor getCursorForQuery(String query){
+    return db.getCursorForQuery(query);
+  }
+
   //TODO remove .toArray()
   public Student[] getAllStudents() {
     List<Student> students = db.getAllStudents();
@@ -113,13 +117,8 @@ public class JsiPocModule extends ReactContextBaseJavaModule {
   }
 
 
-  public Cursor getAllStudentsCursor(){
-   return db.getAllStudentCursor();
-  }
 
   private final class FetchFromSharedPref extends AsyncTask<String, String, String> {
-
-
     @Override
     protected String doInBackground(String... strings) {
       SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getReactApplicationContext());
