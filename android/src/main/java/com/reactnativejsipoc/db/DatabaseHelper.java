@@ -8,8 +8,9 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-
+import java.util.Map;
 
 
 public class DatabaseHelper extends SQLiteOpenHelper {
@@ -73,6 +74,26 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     return db.rawQuery(query, null);
   }
 
+
+  public List<Map<String, String>> getMapForQuery(String query) {
+    List<Map<String, String>> maplist = new ArrayList<>();
+    SQLiteDatabase db = this.getReadableDatabase();
+    Cursor cursor = db.rawQuery(query, null);
+    if (cursor.moveToFirst()) {
+      do {
+        HashMap<String, String> map = new HashMap<String, String>();
+        for(int i=0; i<cursor.getColumnCount();i++)
+        {
+          map.put(cursor.getColumnName(i), cursor.getString(i));
+        }
+
+        maplist.add(map);
+      } while (cursor.moveToNext());
+    }
+    db.close();
+    return maplist;
+  }
+
   /**
    * Approach 2:
    * The aim here is to keep control on Platform side.
@@ -109,6 +130,41 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     // return notes list
     return students;
+  }
+
+
+  /**
+   * Approach 3:
+   * The aim here is to keep control on Platform side.
+   * The cursor iterates and provides a list of known objects to React Native through JSI.
+   * @return
+   */
+  public String[][] getStudentArrays() {
+    // Select All Query
+    String selectQuery = "SELECT  * FROM " + Student.TABLE_NAME;
+    SQLiteDatabase db = this.getWritableDatabase();
+    Cursor cursor = db.rawQuery(selectQuery, null);
+    String[][] studentsArray = new String[102][]; // replace with cursor.getCount
+    // looping through all rows and adding to list
+    int i=1;
+    String[] columnNames = {Student.COLUMN_ID, Student.COLUMN_NOTE,Student.COLUMN_TIMESTAMP};
+    studentsArray[0] = columnNames;
+    if (cursor.moveToFirst()) {
+      do {
+        String[] columnValues = {String.valueOf(cursor.getInt(cursor.getColumnIndex(Student.COLUMN_ID))), cursor.getString(cursor.getColumnIndex(Student.COLUMN_NOTE)),cursor.getString(cursor.getColumnIndex(Student.COLUMN_TIMESTAMP))};
+        studentsArray[i] = columnValues;
+        i = i+1;
+      } while (cursor.moveToNext() && i<101);
+    }
+
+    // close the cursor
+    cursor.close();
+
+    // close db connection
+    db.close();
+
+    // return notes list
+    return studentsArray;
   }
 
 

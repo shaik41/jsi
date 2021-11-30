@@ -67,7 +67,6 @@ export default function App() {
       setTimeinMilli(timeInMs);
       setLastOperation('get From SP JSI');
       bench.stop();
-      //setSpValue(value);
       console.log(value);
     });
   };
@@ -169,16 +168,16 @@ export default function App() {
     console.log(JSON.stringify(a));
   };
 
-  const getObjectFromJavaAndroidBridge = () => {
-    const bench = Reactotron.benchmark('getObjectFromJavaAndroidBridge');
+  const addStudentsToDBBridge = () => {
+    const bench = Reactotron.benchmark('addStudentsToDBBridge');
     const timeStart = Date.now();
-    NativeModules.SharedPreferences.getObjectFromJava((a) => {
+
+    NativeModules.SharedPreferences.createStudents((value) => {
       const timeEnd = Date.now();
       timeInMs = timeEnd - timeStart;
       setTimeinMilli(timeInMs);
-      setLastOperation('getObjectFromJavaAndroidBridge');
+      setLastOperation('addStudentsToDBBridge');
       bench.stop();
-      console.log(JSON.stringify(a));
     });
   };
 
@@ -193,46 +192,108 @@ export default function App() {
     bench.stop();
   };
 
-  const getStudentsFromDB = () => {
-    const bench = Reactotron.benchmark('getStudentsFromDB');
+  const getObjectFromJavaAndroidBridge = () => {
+    const bench = Reactotron.benchmark('getObjectFromJavaAndroidBridge');
     const timeStart = Date.now();
-    const students = getStudents();
-    const timeEnd = Date.now();
-    timeInMs = timeEnd - timeStart;
-    setTimeinMilli(timeInMs);
-    setLastOperation('getStudentsFromDB');
-    bench.stop();
-    console.log(JSON.stringify(students));
-  };
-
-  const addStudentsToDBBridge = () => {
-    const bench = Reactotron.benchmark('addStudentsToDBBridge');
-    const timeStart = Date.now();
-
-    NativeModules.SharedPreferences.createStudents((value) => {
+    NativeModules.SharedPreferences.getObjectFromJava((a) => {
       const timeEnd = Date.now();
       timeInMs = timeEnd - timeStart;
       setTimeinMilli(timeInMs);
-      setLastOperation('addStudentsToDBBridge');
+      setLastOperation('getObjectFromJavaAndroidBridge');
       bench.stop();
+      console.log(JSON.stringify(a));
     });
   };
 
   const getStudentsFromDBBridge = () => {
-    const bench = Reactotron.benchmark('getStudentsFromDBBridge');
+    const bench = Reactotron.benchmark(
+      'get_Students_From_DB_Over_Bridge : Java (Get Array of Students from DB ) -> Bridge (Serialization  / Deserialization ) -> JS (Get Array of Students)'
+    );
     const timeStart = Date.now();
     NativeModules.SharedPreferences.getAllStudents((result) => {
       const timeEnd = Date.now();
       timeInMs = timeEnd - timeStart;
       setTimeinMilli(timeInMs);
-      setLastOperation('getStudentsFromDBBridge');
+      setLastOperation(
+        'get_Students_From_DB_Over_Bridge : Java (Get Array of Students from DB ) -> Bridge (Serialization  / Deserialization ) -> JS (Get Array of Students)'
+      );
       bench.stop();
       console.log(JSON.stringify(result));
     });
   };
 
+  const getStudentsFromDB = () => {
+    const bench = Reactotron.benchmark(
+      'get_Students_From_DB_Over_JSI : Java (Get Array of Students from DB ) -> C++ (Convert Java Array to JSI Array) -> JS (Get Array of Students)'
+    );
+    const timeStart = Date.now();
+    const students = getStudents();
+    const timeEnd = Date.now();
+    timeInMs = timeEnd - timeStart;
+    setTimeinMilli(timeInMs);
+    setLastOperation(
+      'get_Students_From_DB_Over_JSI : Java (Get Array of Students from DB ) -> C++ (Convert Java Array to JSI Object Array) -> JS (Get Array of Students)'
+    );
+    bench.stop();
+    console.log(JSON.stringify(students));
+    console.log(students.length);
+  };
+
+  const getStudentsFromDBAsList = () => {
+    const bench = Reactotron.benchmark(
+      'get_Students_From_DB_Over_JSI_as_list : Java (Get List of Students from DB ) -> C++ (Convert ArrayList to JSI Array) -> JS (Get Array of Students)'
+    );
+    const timeStart = Date.now();
+    const students = getStudentsLists();
+    const timeEnd = Date.now();
+    timeInMs = timeEnd - timeStart;
+    setTimeinMilli(timeInMs);
+    setLastOperation(
+      'get_Students_From_DB_Over_JSI_as_list : Java (Get List of Students from DB ) -> C++ (Convert ArrayList to JSI Object Array) -> JS (Get Array of Students)'
+    );
+    bench.stop();
+    console.log(JSON.stringify(students));
+    console.log(students.length);
+  };
+
+  const getStudentsFromDBJavaAndCPlusPlus = () => {
+    const bench = Reactotron.benchmark(
+      'get_Rows_As_List_Of_Map_From_DB_Over_JSI : Java (Get List of Map Objects from DB ) -> C++ (Convert List of Map Objects to JSI Object Array) -> JS (Get Array of Students)'
+    );
+    const timeStart = Date.now();
+    const students = getMapForQuery('SELECT * from students');
+    const timeEnd = Date.now();
+    timeInMs = timeEnd - timeStart;
+    setTimeinMilli(timeInMs);
+    setLastOperation(
+      'get_Rows_As_List_Of_Map_From_DB_Over_JSI : Java (Get List of Map Objects from DB ) -> C++ (Convert List of Map Objects to JSI Object Array) -> JS (Get Array of Students)'
+    );
+    bench.stop();
+    console.log(JSON.stringify(students));
+    console.log(students.length);
+  };
+
+  const getStudentsAsDoubleArrayFromJSI = () => {
+    const bench = Reactotron.benchmark(
+      'get_Rows_As_Double_Array_From_DB_Over_JSI : Java (Get 2D array Objects from DB ) -> C++ (Convert 2D array  Objects to JSI Object Array) -> JS (Get Array of Students)'
+    );
+    const timeStart = Date.now();
+    const students = getStudentsAsDoubleArray();
+    const timeEnd = Date.now();
+    timeInMs = timeEnd - timeStart;
+    setTimeinMilli(timeInMs);
+    setLastOperation(
+      'get_Rows_As_Double_Array_From_DB_Over_JSI : Java (Get 2D array Objects from DB ) -> C++ (Convert 2D array Objects to JSI Object Array) -> JS (Get Array of Students)'
+    );
+    bench.stop();
+    console.log(JSON.stringify(students));
+    console.log(students.length);
+  };
+
   const getCursorOfQuery = () => {
-    const bench = Reactotron.benchmark('getCursorOfQuery');
+    const bench = Reactotron.benchmark(
+      'get_Cursor_Object_From_DB_Over_JSI_Iterate_JS : Java (Get Cursor Object from DB Query ) -> C++ (Convert Cursor Object to JSI Object) -> JS (Use JSI Cursor Object to iterate over the DB and get Array of Students)'
+    );
     const timeStart = Date.now();
     const cursor = getCursorForQuery('SELECT * from students');
     const studentArray = [];
@@ -249,9 +310,30 @@ export default function App() {
     const timeEnd = Date.now();
     timeInMs = timeEnd - timeStart;
     setTimeinMilli(timeInMs);
-    setLastOperation('get Students using cursor from JSI');
+    setLastOperation(
+      'get_Cursor_Object_From_DB_Over_JSI_Iterate_JS : Java (Get Cursor Object from DB Query ) -> C++ (Convert Cursor Object to JSI Object) -> JS (Use JSI Cursor Object to iterate over the DB and get Array of Students)'
+    );
     bench.stop();
     console.log(studentArray);
+    console.log(studentArray.length);
+  };
+
+  const getStudentsFromCPlusPlus = () => {
+    const bench = Reactotron.benchmark(
+      'get_Cursor_Object_From_DB_Over_JSI_Iterate_C++ : Java (Get Cursor Object from DB Query ) -> C++ (Use Java Cursor Object to iterate over the DB and get Array of Students) -> JS (Get Array of Students)'
+    );
+    const timeStart = Date.now();
+    const students = getAllColumsForQuery('SELECT * from students');
+    const timeEnd = Date.now();
+    timeInMs = timeEnd - timeStart;
+    setTimeinMilli(timeInMs);
+
+    setLastOperation(
+      'get_Cursor_Object_From_DB_Over_JSI_Iterate_C++ : Java (Get Cursor Object from DB Query ) -> C++ (Use Java Cursor Object to iterate over the DB and get Array of Students) -> JS (Get Array of Students)'
+    );
+    bench.stop();
+    console.log(students);
+    console.log(students.length)
   };
 
   return (
@@ -363,40 +445,73 @@ export default function App() {
           <Text>---------------------------------</Text>
           <TouchableHighlight
             style={styles.backgroundButton}
-            onPress={addStudentsToDB}
+            onPress={addStudentsToDBBridge}
           >
-            <Text style={styles.textButton}>Add Students to DB JSI </Text>
+            <Text style={styles.textButton}>Add Students to DB Bridge </Text>
+          </TouchableHighlight>
+          <Text>---------------------------------</Text>
+          <TouchableHighlight
+            style={styles.backgroundButton}
+            onPress={getStudentsFromDBBridge}
+          >
+            <Text style={styles.textButton}>
+              Get Students from DB Bridge,Cursor Iteration on Java.
+            </Text>
           </TouchableHighlight>
 
           <TouchableHighlight
             style={styles.backgroundButton}
             onPress={getStudentsFromDB}
           >
-            <Text style={styles.textButton}>Get Students from DB JSI </Text>
-          </TouchableHighlight>
-
-          <Text>---------------------------------</Text>
-          <TouchableHighlight
-            style={styles.backgroundButton}
-            onPress={addStudentsToDBBridge}
-          >
-            <Text style={styles.textButton}>Add Students to DB Bridge </Text>
+            <Text style={styles.textButton}>
+              Get Students from DB JSI,Cursor Iteration on Java. Returned As
+              Array.
+            </Text>
           </TouchableHighlight>
 
           <TouchableHighlight
             style={styles.backgroundButton}
-            onPress={getStudentsFromDBBridge}
+            onPress={getStudentsFromDBAsList}
           >
-            <Text style={styles.textButton}>Get Students from DB Bridge </Text>
+            <Text style={styles.textButton}>
+              Get Students from DB JSI,Cursor Iteration on Java. Returned As
+              List.
+            </Text>
           </TouchableHighlight>
 
-          <Text>---------------------------------</Text>
           <TouchableHighlight
             style={styles.backgroundButton}
             onPress={getCursorOfQuery}
           >
             <Text style={styles.textButton}>
-              Get Students from DB JSI using Cursor
+              Get Students from DB JSI, Cursor Iteration on JS.
+            </Text>
+          </TouchableHighlight>
+          <TouchableHighlight
+            style={styles.backgroundButton}
+            onPress={getStudentsFromCPlusPlus}
+          >
+            <Text style={styles.textButton}>
+              Get Students from DB JSI, Cursor Iteration on C++.
+            </Text>
+          </TouchableHighlight>
+
+          <TouchableHighlight
+            style={styles.backgroundButton}
+            onPress={getStudentsFromDBJavaAndCPlusPlus}
+          >
+            <Text style={styles.textButton}>
+              Get Students from DB JSI, Cursor Iteration on Java and Map
+              Iteration on C++.
+            </Text>
+          </TouchableHighlight>
+
+          <TouchableHighlight
+            style={styles.backgroundButton}
+            onPress={getStudentsAsDoubleArrayFromJSI}
+          >
+            <Text style={styles.textButton}>
+              Get Students from DB JSI, Cursor Iteration on Java and Array elements from c++
             </Text>
           </TouchableHighlight>
         </View>

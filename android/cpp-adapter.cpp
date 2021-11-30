@@ -410,6 +410,289 @@ void installFromAndroid(facebook::jsi::Runtime &jsiRuntime) {
 
     jsiRuntime.global().setProperty(jsiRuntime, "getStudents", move(getStudents));
 
+    auto getStudentsLists = Function::createFromHostFunction(jsiRuntime,
+                                                        PropNameID::forAscii(jsiRuntime,
+                                                                             "getStudentsLists"),0,
+                                                        [](Runtime &runtime,
+                                                           const Value &thisValue,
+                                                           const Value *arguments,
+                                                           size_t count) -> Value {
+
+                                                            Array objectArray = Array(runtime, 100);
+
+                                                            JNIEnv *jniEnv = GetJniEnv();
+
+                                                            java_class = jniEnv->GetObjectClass(
+                                                                    java_object);
+
+
+                                                            // retrieve the java.util.List interface class
+                                                            jclass cList = jniEnv->FindClass("java/util/List");
+
+                                                            // retrieve the size and the get method
+                                                            jmethodID mSize = jniEnv->GetMethodID(cList, "size", "()I");
+                                                            jmethodID mGet = jniEnv->GetMethodID(cList, "get",
+                                                                                                 "(I)Ljava/lang/Object;");
+
+
+                                                            jmethodID methodID = jniEnv->GetMethodID(
+                                                                    java_class, "getAllStudentsList",
+                                                                    "()Ljava/util/List;");
+
+
+                                                            jobject studentList =  jniEnv->CallObjectMethod(
+                                                                    java_object, methodID);
+
+                                                            jint size = jniEnv->CallIntMethod(studentList, mSize);
+
+                                                            for (int i = 0; i < size; i++) {
+
+                                                                jvalue params[1];
+                                                                params[0].i = i;
+
+                                                                jobject studentObject = jniEnv->CallObjectMethodA(studentList, mGet, params);
+
+                                                                jclass studentClass = jniEnv->GetObjectClass(
+                                                                        studentObject);
+
+                                                                //For name
+                                                                jfieldID name = jniEnv->GetFieldID(
+                                                                        studentClass, "name",
+                                                                        "Ljava/lang/String;");
+                                                                jobject nameVal = jniEnv->GetObjectField(
+                                                                        studentObject, name);
+                                                                const char *strNameValue = jniEnv->GetStringUTFChars(
+                                                                        (jstring) nameVal, NULL);
+                                                                //For timestamp
+                                                                jfieldID timeStamp = jniEnv->GetFieldID(
+                                                                        studentClass, "timestamp",
+                                                                        "Ljava/lang/String;");
+                                                                jobject timeStampVal = jniEnv->GetObjectField(
+                                                                        studentObject, timeStamp);
+                                                                const char *strTimestampValue = jniEnv->GetStringUTFChars(
+                                                                        (jstring) timeStampVal,
+                                                                        NULL);
+                                                                //For id
+                                                                jfieldID id = jniEnv->GetFieldID(
+                                                                        studentClass, "id", "I");
+                                                                jint idValue = jniEnv->GetIntField(
+                                                                        studentObject, id);
+
+
+                                                                Object obj = Object(runtime);
+                                                                obj.setProperty(runtime, "name",
+                                                                                String::createFromUtf8(
+                                                                                        runtime,
+                                                                                        strNameValue));
+                                                                obj.setProperty(runtime,
+                                                                                "timestamp",
+                                                                                String::createFromUtf8(
+                                                                                        runtime,
+                                                                                        strTimestampValue));
+                                                                obj.setProperty(runtime, "id",
+                                                                                Value(idValue));
+
+                                                                objectArray.setValueAtIndex(runtime,
+                                                                                            i, obj);
+                                                            }
+
+                                                            return Value(runtime, objectArray);
+                                                        });
+
+    jsiRuntime.global().setProperty(jsiRuntime, "getStudentsLists", move(getStudentsLists));
+
+
+    auto getStudentsAsDoubleArray = Function::createFromHostFunction(jsiRuntime,
+                                                             PropNameID::forAscii(jsiRuntime,
+                                                                                  "getStudentsAsDoubleArray"),0,
+                                                             [](Runtime &runtime,
+                                                                const Value &thisValue,
+                                                                const Value *arguments,
+                                                                size_t count) -> Value {
+
+                                                                 JNIEnv *jniEnv = GetJniEnv();
+
+                                                                 java_class = jniEnv->GetObjectClass(
+                                                                         java_object);
+
+                                                                 jmethodID methodID = jniEnv->GetMethodID(
+                                                                         java_class, "getAllStudentsArray",
+                                                                         "()[[Ljava/lang/String;");
+
+                                                                 jobjectArray studentObjectArray = (jobjectArray) jniEnv->CallObjectMethod(
+                                                                         java_object, methodID);
+
+                                                                 int size = jniEnv->GetArrayLength(studentObjectArray);
+                                                                 const int maxColumnSize = 10;
+                                                                 const char *data[maxColumnSize] = {};
+                                                                 int columnLength = 3; //default value
+                                                                 Array objectArray = Array(runtime, size);
+                                                                 for (int i = 0; i < 100 ; i++) {
+                                                                     jobjectArray studentArray =(jobjectArray) jniEnv->GetObjectArrayElement(
+                                                                             studentObjectArray, i);
+                                                                     columnLength = jniEnv->GetArrayLength(studentArray);
+                                                                     if(i==0){
+
+                                                                         for(int j=0;j<columnLength;j++){
+                                                                             jstring columnName =  (jstring) jniEnv->GetObjectArrayElement(
+                                                                                     studentArray, j);
+                                                                             const char *columnNameChars = jniEnv->GetStringUTFChars(
+                                                                                     columnName,
+                                                                                     NULL);
+                                                                             data[j] = columnNameChars;
+                                                                         }
+                                                                     }else{
+                                                                         Object obj = Object(runtime);
+                                                                         for(int k=0;k<columnLength;k++){
+                                                                             jstring columnValue =  (jstring) jniEnv->GetObjectArrayElement(
+                                                                                     studentArray, k);
+                                                                             const char *columnValueChars = jniEnv->GetStringUTFChars(
+                                                                                     columnValue,
+                                                                                     NULL);
+                                                                             obj.setProperty(runtime,String::createFromUtf8(
+                                                                                     runtime,
+                                                                                     data[k]) ,
+                                                                                             String::createFromUtf8(
+                                                                                                     runtime,
+                                                                                                     columnValueChars));
+
+                                                                         }
+                                                                         objectArray.setValueAtIndex(runtime,
+                                                                                                     i-1, obj);
+                                                                     }
+
+                                                                 }
+
+                                                                 return Value(runtime, objectArray);
+                                                             });
+
+    jsiRuntime.global().setProperty(jsiRuntime, "getStudentsAsDoubleArray", move(getStudentsAsDoubleArray));
+
+
+    auto getMapForQuery = Function::createFromHostFunction(jsiRuntime,
+                                                        PropNameID::forAscii(jsiRuntime,
+                                                                             "getMapForQuery"),
+                                                        1,
+                                                        [](Runtime &runtime,
+                                                           const Value &thisValue,
+                                                           const Value *arguments,
+                                                           size_t count) -> Value {
+
+                                                            Array objectArray = Array(runtime, 100);
+
+                                                            JNIEnv *jniEnv = GetJniEnv();
+
+                                                            java_class = jniEnv->GetObjectClass(
+                                                                    java_object);
+
+
+                                                            // retrieve the java.util.List interface class
+                                                            jclass cList = jniEnv->FindClass("java/util/List");
+
+                                                            // retrieve the size and the get method
+                                                            jmethodID mSize = jniEnv->GetMethodID(cList, "size", "()I");
+                                                            jmethodID mGet = jniEnv->GetMethodID(cList, "get",
+                                                                                                 "(I)Ljava/lang/Object;");
+
+
+                                                            // Get the Map's entry Set.
+                                                            jclass mapClass = jniEnv->FindClass("java/util/Map");
+
+                                                            jmethodID entrySet = jniEnv->GetMethodID(mapClass, "entrySet", "()Ljava/util/Set;");
+
+
+                                                            // Get the Entry class method IDs
+                                                            jclass entryClass = jniEnv->FindClass("java/util/Map$Entry");
+
+                                                            jmethodID getKey =
+                                                                    jniEnv->GetMethodID(entryClass, "getKey", "()Ljava/lang/Object;");
+
+                                                            jmethodID getValue =
+                                                                    jniEnv->GetMethodID(entryClass, "getValue", "()Ljava/lang/Object;");
+
+
+                                                            // Obtain an iterator over the Set
+                                                            jclass setClass = jniEnv->FindClass("java/util/Set");
+
+                                                            jmethodID iterator =
+                                                                    jniEnv->GetMethodID(setClass, "iterator", "()Ljava/util/Iterator;");
+
+                                                            // Get the Iterator method IDs
+                                                            jclass iteratorClass = jniEnv->FindClass("java/util/Iterator");
+
+                                                            jmethodID hasNext = jniEnv->GetMethodID(iteratorClass, "hasNext", "()Z");
+
+                                                            jmethodID next =
+                                                                    jniEnv->GetMethodID(iteratorClass, "next", "()Ljava/lang/Object;");
+
+
+                                                            //Get List of objects
+
+                                                            string keyArg = arguments[0].getString(
+                                                                            runtime)
+                                                                    .utf8(
+                                                                            runtime);
+                                                            jstring jstr1 = string2jstring(jniEnv,
+                                                                                           keyArg);
+                                                            jvalue params2[1];
+                                                            params2[0].l = jstr1;
+
+                                                            jmethodID methodIDForQuery = jniEnv->GetMethodID(
+                                                                    java_class, "getMapForQuery",
+                                                                    "(Ljava/lang/String;)Ljava/util/List;");
+
+
+                                                            jobject  mapOfObjects = jniEnv->CallObjectMethodA(
+                                                                    java_object, methodIDForQuery,params2);
+
+                                                            jint size = jniEnv->CallIntMethod(mapOfObjects, mSize);
+
+
+                                                            for(jint i=0;i<size;i++) {
+
+                                                                jvalue params[1];
+                                                                params[0].i = i;
+
+                                                                jobject hashMap = jniEnv->CallObjectMethodA(mapOfObjects, mGet, params);
+
+                                                                jobject set = jniEnv->CallObjectMethod(hashMap, entrySet);
+
+                                                                jobject iter = jniEnv->CallObjectMethod(set, iterator);
+
+                                                                Object obj = Object(runtime);
+                                                                while (jniEnv->CallBooleanMethod(
+                                                                        iter, hasNext)) {
+                                                                    jobject entry = jniEnv->CallObjectMethod(
+                                                                            iter, next);
+                                                                    // retrieve key
+                                                                    jstring key = (jstring) jniEnv->CallObjectMethod(
+                                                                            entry, getKey);
+                                                                    // retrieve value
+                                                                    jstring value = (jstring) jniEnv->CallObjectMethod(
+                                                                            entry, getValue);
+
+                                                                    const char *keyString = jniEnv->GetStringUTFChars(
+                                                                            key, NULL);
+
+                                                                    const char *valueString = jniEnv->GetStringUTFChars(
+                                                                            value, NULL);
+
+                                                                    obj.setProperty(runtime,
+                                                                                    String::createFromUtf8(
+                                                                                            runtime,
+                                                                                            keyString),
+                                                                                    String::createFromUtf8(
+                                                                                            runtime,
+                                                                                            valueString));                                                                // retrieve value
+                                                                }
+
+                                                                objectArray.setValueAtIndex(runtime,i,obj);
+                                                            }
+
+                                                           return Value(runtime, objectArray);
+                                                        });
+
+    jsiRuntime.global().setProperty(jsiRuntime, "getMapForQuery", move(getMapForQuery));
 
 
 
@@ -621,6 +904,107 @@ void installFromAndroid(facebook::jsi::Runtime &jsiRuntime) {
                                                         });
 
     jsiRuntime.global().setProperty(jsiRuntime, "getCursorForQuery", move(getCursorForQuery));
+
+
+    auto getAllColumsForQuery = Function::createFromHostFunction(jsiRuntime,
+                                                              PropNameID::forAscii(jsiRuntime,
+                                                                                   "getAllColumsForQuery"),
+                                                              1,
+                                                              [](Runtime &runtime,
+                                                                 const Value &thisValue,
+                                                                 const Value *arguments,
+                                                                 size_t count) -> Value {
+
+                                                                  Array objectArray = Array(runtime, 100);
+
+                                                                  string key = arguments[0].getString(
+                                                                                  runtime)
+                                                                          .utf8(
+                                                                                  runtime);
+
+
+
+                                                                  JNIEnv *jniEnv = GetJniEnv();
+                                                                  jniEnvTest = jniEnv;
+
+                                                                  java_class = jniEnv->GetObjectClass(
+                                                                          java_object);
+
+                                                                  jmethodID methodID = jniEnv->GetMethodID(
+                                                                          java_class, "getCursorForQuery",
+                                                                          "(Ljava/lang/String;)Landroid/database/Cursor;");
+
+                                                                  jstring jstr1 = string2jstring(jniEnvTest,
+                                                                                                 key);
+
+                                                                  jvalue params2[1];
+                                                                  params2[0].l = jstr1;
+
+                                                                  cursorObject =  jniEnv->CallObjectMethodA(
+                                                                          java_object, methodID,params2);
+
+                                                                  jclass cursor_object_class = jniEnv->GetObjectClass(
+                                                                          cursorObject);
+
+                                                                  jmethodID getMoveToFirstMethodID = jniEnvTest->GetMethodID(
+                                                                          cursor_object_class, "moveToFirst",
+                                                                          "()Z");
+
+                                                                  jmethodID getMoveToNextMethodID = jniEnvTest->GetMethodID(
+                                                                          cursor_object_class, "moveToNext",
+                                                                          "()Z");
+
+                                                                  jmethodID getStringMethodID = jniEnvTest->GetMethodID(
+                                                                          cursor_object_class, "getString",
+                                                                          "(I)Ljava/lang/String;");
+
+                                                                  jmethodID getColumnCount = jniEnvTest->GetMethodID(
+                                                                          cursor_object_class, "getColumnCount",
+                                                                          "()I");
+
+                                                                  jmethodID getColumnNameMethodID = jniEnvTest->GetMethodID(
+                                                                          cursor_object_class, "getColumnName",
+                                                                          "(I)Ljava/lang/String;");
+
+                                                                  closeMethodID = jniEnvTest->GetMethodID(
+                                                                          cursor_object_class, "close",
+                                                                          "()V");
+
+                                                                  jboolean moveToFirst = jniEnvTest->CallBooleanMethod(cursorObject,getMoveToFirstMethodID);
+                                                                  jboolean moveToNext = false;
+                                                                  if(moveToFirst){
+                                                                      Object obj = Object(runtime);
+                                                                      jint size = jniEnvTest->CallIntMethod(cursorObject,getColumnCount);
+                                                                      jint start = 0;
+                                                                      do{
+                                                                          for(int i=0;i<size;i++){
+                                                                              jvalue params[1];
+                                                                              params[0].i = i;
+
+                                                                              jobject columnNameJNI = jniEnvTest->CallObjectMethodA(cursorObject,getColumnNameMethodID,params);
+                                                                              const char *columnNameJNIValue = jniEnvTest->GetStringUTFChars(
+                                                                                      (jstring) columnNameJNI,
+                                                                                      NULL);
+
+                                                                              jobject columnValueJNI = jniEnvTest->CallObjectMethodA(cursorObject,getStringMethodID,params);
+                                                                              const char *columnValueJNIValue = jniEnvTest->GetStringUTFChars(
+                                                                                      (jstring) columnValueJNI,
+                                                                                      NULL);
+
+                                                                              obj.setProperty(runtime,String::createFromUtf8(
+                                                                                      runtime, columnNameJNIValue),String::createFromUtf8(
+                                                                                      runtime, columnValueJNIValue));
+                                                                          }
+                                                                          objectArray.setValueAtIndex(runtime,start++,obj);
+                                                                          moveToNext = jniEnvTest->CallBooleanMethod(cursorObject,getMoveToNextMethodID);
+                                                                      }while(moveToNext);
+
+                                                                  }
+                                                                  jniEnvTest->CallVoidMethod(cursorObject,closeMethodID);
+                                                                  return Value(runtime, objectArray);
+                                                              });
+
+    jsiRuntime.global().setProperty(jsiRuntime, "getAllColumsForQuery", move(getAllColumsForQuery));
 
 
 

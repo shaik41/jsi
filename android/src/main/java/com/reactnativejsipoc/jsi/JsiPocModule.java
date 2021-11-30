@@ -18,7 +18,9 @@ import com.reactnativejsipoc.db.Student;
 import com.reactnativejsipoc.db.StudentNames;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @ReactModule(name = JsiPocModule.NAME)
 public class JsiPocModule extends ReactContextBaseJavaModule {
@@ -109,11 +111,25 @@ public class JsiPocModule extends ReactContextBaseJavaModule {
     return db.getCursorForQuery(query);
   }
 
+
+  public List<Map<String,String>> getMapForQuery(String query){
+    return db.getMapForQuery(query);
+  }
+
+
   //TODO remove .toArray()
   public Student[] getAllStudents() {
     List<Student> students = db.getAllStudents();
     Student[] students1 = new Student[students.size()];
     return students.toArray(students1);
+  }
+
+  public List<Student> getAllStudentsList() {
+    return db.getAllStudents();
+  }
+
+  public String[][] getAllStudentsArray() {
+    return db.getStudentArrays();
   }
 
 
