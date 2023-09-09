@@ -1,54 +1,49 @@
-# What is JSI?
+# JSI (JavaScript Interface)
 
-It's an interface which enables JavaScript (whether it's JSC or Hermes) to communicate with native (C++) and vice versa. 
+JSI is an interface that enables JavaScript (whether it's JSC or Hermes) to communicate with native code written in C++ and vice versa. It provides a direct communication channel between JavaScript and native code, eliminating the need for a bridge.
 
-Hence using this we can eliminate the bridge. Instead we can take the following route.
+## Usage
 
-Android : Java <-> JNI <-> JSI <-> Javascript.\
-iOS : ObjC <-> JSI <-> Javascript.
-# Benchmarking JSI
+Using JSI, you can establish the following communication routes:
 
-1. RN version: 0.63.4
-2. NDK Version: 22.0.x
-3. CMake Version: 3.10.x
-4. Test Device : Samsung S10
+- **Android**:
+  - Java <-> JNI <-> JSI <-> JavaScript.
+- **iOS**:
+  - ObjC <-> JSI <-> JavaScript.
 
-# Operations
-1. Get String from KV store: 
-    1. Android Shared Prefs over JSI
-    2. Async Storage 
-    3. Android Shared Pref over Bridge
-2. Retrieve a Java String 
-    1. JSI
-    2. Bridge
-3. Retrieve a Java Object 
-    1. JSI
-    2. Bridge
-4. Query 100 Rows from Table 
-    1. JSI
-    2. Bridge    
+## Benchmarking (Test Environment)
 
+- React Native (RN) version: 0.63.4
+- NDK Version: 22.0.x
+- CMake Version: 3.10.x
+- Test Device: Samsung S10
 
-# Results:
-1. Get a JSON string of 212148 characters from KV Store 
-    1. JSI (Async - Spawn a thread on Java)= ~ 5 MS (Min 2 MS - Max 8 MS)
-    2. JSI (Sync)= ~ 2 MS (Min 1 MS - Max 3 MS)
-    3. Async Storage = ~ 22 MS (Min 12 - Max 35 MS))
-    4. Bridge = ~ 14 MS (Min 8 MS - Max 20 MS)
+## Operations and Results
 
-2. Get a Java String to JS through JNI and JSI
-    1. JSI = <= 1 MS (Min 0 MS - Max 1 MS)
-    2. Bridge = ~ 8 MS (Min 6 MS - Max 15 MS)
+### Get String from KV Store:
 
-3. Get a Java Object (Two String properties) to JS through JNI and JSI 
-    1. JSI = <= 1 MS (Min 0 MS - Max 1 MS)
-    2. Bridge = ~ 14 MS (Min 10 MS - Max 18 MS)
+- Android Shared Prefs over JSI:
+  - JSI (Async - Spawn a thread on Java): ~5 MS (Min 2 MS - Max 8 MS)
+  - JSI (Sync): ~2 MS (Min 1 MS - Max 3 MS)
+- Async Storage: ~22 MS (Min 12 MS - Max 35 MS)
+- Android Shared Pref over Bridge: ~14 MS (Min 8 MS - Max 20 MS)
 
-4. Query 100 rows of students in a class table - (Query time is ~ 5-10 MS)
-    1. JSI = ~ 15 MS (Min 10 MS -  Max 20 MS ) - Cursor iteration on Java.
-    2. JSI = ~ 22 MS (Min 15 MS - Max 30 MS) - Cursor iteration on JS. 
-    2. Bridge = ~ 45 MS (Min 30 MS - Max 60 MS)
+### Get a Java String to JS through JNI and JSI:
+
+- JSI: <=1 MS (Min 0 MS - Max 1 MS)
+- Bridge: ~8 MS (Min 6 MS - Max 15 MS)
+
+### Get a Java Object (Two String properties) to JS through JNI and JSI:
+
+- JSI: <=1 MS (Min 0 MS - Max 1 MS)
+- Bridge: ~14 MS (Min 10 MS - Max 18 MS)
+
+### Query 100 Rows from Table:
+
+- JSI (Cursor iteration on Java): ~15 MS (Min 10 MS - Max 20 MS)
+- JSI (Cursor iteration on JS): ~22 MS (Min 15 MS - Max 30 MS)
+- Bridge: ~45 MS (Min 30 MS - Max 60 MS)
 
 ## License
 
-MIT
+This project is licensed under the MIT License.
